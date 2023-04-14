@@ -2,6 +2,7 @@ package com.example.avoidvoice.chatapi;
 
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -28,16 +29,11 @@ chatGpt turbo 3.5 model api
  */
 public class ChatGptApi {
 
-    /*
-    api response 을 출력할 activity 를 받는 변수
-    생성자함수 에서 초기화 합니다.
-     */
-    private TestActivity testActivity;
 
     /*
     api response 값 저장 변수
      */
-    String result;
+    private String responseMessage;
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
@@ -52,15 +48,14 @@ public class ChatGptApi {
             .readTimeout(30, TimeUnit.SECONDS)
             .build();
 
-    public ChatGptApi(TestActivity testActivity){
-        this.testActivity = testActivity;
-    }
 
     /*
     실제 api를 호출하는 메서드
      */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    public void callAPI(String question){
+    public void callAPI(String question, APICallback apiCallback){
+
+        Log.d("callAPI 시작 : ", question);
 
         JSONObject jsonBody = new JSONObject();
         JSONObject message = new JSONObject();
@@ -70,11 +65,13 @@ public class ChatGptApi {
             message.put("role", "user");
             message.put("content", question);
             jsonBody.append("messages", message);
-            jsonBody.put("max_tokens",4000);
+            jsonBody.put("max_tokens",500);
             jsonBody.put("temperature",0);
+            jsonBody.put("n",1);
 
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.d("json body 에러 : ", question);
         }
 
         RequestBody body = RequestBody.create(jsonBody.toString(),JSON);
@@ -87,7 +84,9 @@ public class ChatGptApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                result = "Failed to load response due to "+ e.getMessage();
+                responseMessage = "Failed to load response due to "+ e.getMessage();
+                Log.d("call - onFailure 에러", responseMessage);
+                apiCallback.onFailure(e);
             }
 
             @Override
@@ -96,25 +95,22 @@ public class ChatGptApi {
                     JSONObject  jsonObject = null;
                     try {
                         jsonObject = new JSONObject(response.body().string());
+                        response.close();
                         JSONArray jsonArray = jsonObject.getJSONArray("choices");
-                        result = jsonArray.getJSONObject(0).getJSONObject("message").getString("content").trim();
+                        responseMessage = jsonArray.getJSONObject(0).getJSONObject("message").getString("content").trim();
+                        Log.d("callApi 반환 메세지 : ", responseMessage);
+                        apiCallback.onSuccess(responseMessage);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        Log.d("call - response json exception 에러", question);
                     }
                 }else{
-                    result = "Failed to load response due to "+response.body().toString();
-                }
-            }
-        });
+                    responseMessage = "Failed to load response due to "+response.body().toString();
+                    Log.d("call - response 안떨어짐 에러", question);
+                    response.close();
+                    apiCallback.onSuccess(responseMessage);
 
-        /*
-        response 값을 받아온 엑티비티 텍스트뷰에 세팅
-        후에는 리사이클뷰에 세팅되도록 수정
-         */
-        testActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                testActivity.setTextView(result != null ? result : "null");
+                }
             }
         });
     }

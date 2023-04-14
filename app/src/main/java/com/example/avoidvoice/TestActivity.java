@@ -10,7 +10,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.avoidvoice.chatapi.APIHandler;
 import com.example.avoidvoice.chatapi.ChatGptApi;
+import com.example.avoidvoice.chatapi.TranslateText;
 
 /*
 테스트를 위한 activity class 후에 삭제 예정
@@ -18,6 +20,7 @@ import com.example.avoidvoice.chatapi.ChatGptApi;
 public class TestActivity extends AppCompatActivity {
 
     TextView textView;
+    APIHandler apiHandler = new APIHandler(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,13 +30,13 @@ public class TestActivity extends AppCompatActivity {
         EditText editText = findViewById(R.id.editText);
         Button button = findViewById(R.id.button);
         textView = findViewById(R.id.textView2);
-        ChatGptApi api = new ChatGptApi(this);
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
             @Override
             public void onClick(View view) {
-                api.callAPI(editText.getText().toString().trim());
+                apiHandler.run(editText.getText().toString().trim());
             }
         });
 
