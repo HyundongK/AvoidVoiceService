@@ -99,14 +99,13 @@ public class VoiceAvoidService extends Service {
                 audioInput = AudioConfig.fromStreamInput(createMicrophoneStream());
                 reco = new SpeechRecognizer(speechConfig, audioInput);
 
-                Toast.makeText(getApplicationContext(),"start1",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"start",Toast.LENGTH_SHORT).show();
                 reco.recognizing.addEventListener((o, speechRecognitionResultEventArgs) -> {
                     final String s = speechRecognitionResultEventArgs.getResult().getText();
                     Log.i(logTag, "Intermediate result received: " + s);
                     content.add(s);
                     content.remove(content.size() - 1);
-
-                    Toast.makeText(getApplicationContext(),"start",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"running",Toast.LENGTH_SHORT).show();
                 });
 
                 //event that a speech ended
@@ -116,11 +115,10 @@ public class VoiceAvoidService extends Service {
                     content.add(s);
 
                     content.add(0, "\nMe : ");
+
                     totalcontent.addAll(content);
                     content.clear();
                     //TODO : make to check conversation
-                    Toast.makeText(getApplicationContext(),TextUtils.join("",totalcontent),
-                            Toast.LENGTH_SHORT).show();
 
                     //setRecognizedText(TextUtils.join(" ", content));
                 });
@@ -148,7 +146,7 @@ public class VoiceAvoidService extends Service {
 
         } else {
         }
-        Toast.makeText(getApplicationContext(),"end",
+        Toast.makeText(getApplicationContext(),TextUtils.join("",totalcontent),
                 Toast.LENGTH_SHORT).show();
 
         content.clear();
@@ -170,5 +168,4 @@ public class VoiceAvoidService extends Service {
     static {
         s_executorService = Executors.newCachedThreadPool();
     }
-
 }
