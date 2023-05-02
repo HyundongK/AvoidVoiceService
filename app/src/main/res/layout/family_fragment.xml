@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".family.FamilyFragment"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#B0C6FF">
+
+            <TextView
+                android:id="@+id/F_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="가족지킴이"
+                android:layout_gravity="center"
+                android:textColor="#000000"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/family"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="보이스피싱으로부터 가족을"
+                android:layout_gravity="center"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="지켜주는 가족 지킴이 서비스"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:textSize="18sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/whatis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="가족 지킴이 서비스는?"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp" />
+
+            <TextView
+                android:id="@+id/explain1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="내 소중한 가족과 지인을 피싱 보호 대상자로 등록하고"
+                android:textSize="16sp"
+                android:layout_marginStart="12dp" />
+
+            <TextView
+                android:id="@+id/explain2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="피싱위험이  발생한 경우 보호자에게 문자를  전송하여"
+                android:textSize="16sp"
+                android:layout_marginStart="12dp" />
+
+            <TextView
+                android:id="@+id/explain3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="위험을 예방할 수 있는 서비스입니다."
+                android:textSize="16sp"
+                android:layout_marginStart="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="가족지킴이 서비스 가입하기"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginStart="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="가족 지킴이 서비스 번호 등록"
+                android:textSize="16sp"
+                android:textColor="#4E4E4E"
+                android:layout_marginStart="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="   보호자 전화번호(010-0000-0000)   "
+                    android:textSize="16sp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="15dp"
+                    android:inputType="phone"
+                    android:textColor="#000000"
+                    android:background="@drawable/phone_number"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="등록하기"
+                        android:textSize="15sp"
+                        android:backgroundTint="#4D66A7"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
+
+
+
+
