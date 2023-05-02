@@ -52,15 +52,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
-        Button testButton = findViewById(R.id.testButton);
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent testintent = new Intent(MainActivity.this, TestActivity.class);
-                startActivity(testintent);
-            }
-        });
+        //TODO : 추후 수정
+//        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+//        Button testButton = findViewById(R.id.testButton);
+//        testButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent testintent = new Intent(MainActivity.this, TestActivity.class);
+//                startActivity(testintent);
+//            }
+//        });
     }
 
 }
