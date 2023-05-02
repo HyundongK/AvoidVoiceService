@@ -66,6 +66,7 @@ public class APIHandler {
     private class FinalAPICallback implements APICallback {
         @Override
         public void onSuccess(String resultText) {
+
             targetActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
