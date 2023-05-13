@@ -3,6 +3,7 @@ package com.example.avoidvoice.family;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,8 @@ public class FamilyFragment extends Fragment {
     private Button btn;
     private Button testBtn;
     EditText et;
+    private Button SMStest;
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -36,6 +39,9 @@ public class FamilyFragment extends Fragment {
         et = view.findViewById(R.id.numEdit);
         btn = view.findViewById(R.id.saveBtn);
         testBtn = view.findViewById(R.id.removeBtn);
+        SMStest = view.findViewById(R.id.testSMS);
+
+        //et.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
         // 등록하기 버튼 클릭 시 내부 저장소에 번호 저장
         // Device File Explorer -> data -> data -> avoidvoice 패키지 -> file -> phoneNumber.txt
@@ -47,7 +53,8 @@ public class FamilyFragment extends Fragment {
 //                bundle.putString("number", et.getText().toString());
 
                 // 이렇게 하면 010-xxxx-xxxx로 저장
-                String number = et.getText().toString();
+                String number;
+                number = et.getText().toString();
 
                 try {
                     FileOutputStream fos = getActivity().openFileOutput("phoneNumber.txt", Context.MODE_APPEND);
@@ -77,35 +84,39 @@ public class FamilyFragment extends Fragment {
 
         // --------------------------------------------------------------
         // 문자 보내는 기능인데,,, 테스트를 어떻게 해야할지 모르겠습니다.
-//        String strTmp;
-//        String str = "phoneNumber.txt";
+//        SMStest.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                String strTmp;
+//                String str = "phoneNumber.txt";
 //
-//        try {
-//            FileInputStream fis = getActivity().openFileInput(str);
-//            StringBuffer sb = new StringBuffer();
-//            byte dataBuffer[] = new byte[128];
+//                try {
+//                    FileInputStream fis = getActivity().openFileInput(str);
+//                    StringBuffer sb = new StringBuffer();
+//                    byte dataBuffer[] = new byte[128];
 //
-//            int n = 0;
+//                    int n = 0;
 //
-//            while((n = fis.read(dataBuffer)) != -1){
-//                sb.append(new String(dataBuffer));
+//                    while((n = fis.read(dataBuffer)) != -1){
+//                        sb.append(new String(dataBuffer));
+//                    }
+//
+//                    strTmp = sb.toString();
+//
+//
+//                    try {
+//                        SmsManager smsManager = SmsManager.getDefault();
+//                        smsManager.sendTextMessage(strTmp, null, "보이스피싱 위험 감지", null, null);
+//                    }catch (Exception e){
+//                        //
+//                    }
+//
+//                    fis.close();
+//                } catch (Exception e){
+//                    //empty
+//                }
 //            }
-//
-//            strTmp = sb.toString();
-//
-//
-////            try {
-////                SmsManager smsManager = SmsManager.getDefault();
-////                smsManager.sendTextMessage(strTmp, null, "보이스피싱 위험 감지", null, null);
-////            }catch (Exception e){
-////                //
-////            }
-//
-//            fis.close();
-//        } catch (Exception e){
-//            //empty
-//        }
-
+//        });
 
         // --------------------------------------------------------------
 
