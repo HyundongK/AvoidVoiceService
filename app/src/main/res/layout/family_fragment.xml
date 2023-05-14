@@ -117,13 +117,17 @@
                 android:orientation="horizontal">
 
                 <EditText
+                    android:id="@+id/numEdit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="   보호자 전화번호(010-0000-0000)   "
+                    android:hint="보호자 전화번호(010-0000-0000)"
                     android:textSize="16sp"
+                    android:ems="14"
                     android:layout_gravity="center"
                     android:layout_marginStart="15dp"
+                    android:gravity="center"
                     android:inputType="phone"
+                    android:maxLength="13"
                     android:textColor="#000000"
                     android:background="@drawable/phone_number"/>
 
@@ -132,6 +136,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
                     <Button
+                        android:id="@+id/saveBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -142,6 +147,22 @@
 
             </LinearLayout>
 
+            <Button
+                android:id="@+id/removeBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="삭제"
+                android:textSize="15sp"
+                android:backgroundTint="#4D66A7"/>
+
+
+            <Button
+                android:id="@+id/testSMS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SMS test"
+                android:layout_marginLeft="10dp"/>
 
         </LinearLayout>
 
