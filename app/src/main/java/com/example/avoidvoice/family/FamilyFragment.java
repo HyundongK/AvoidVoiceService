@@ -17,11 +17,13 @@ import androidx.fragment.app.Fragment;
 
 import com.example.avoidvoice.R;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -61,13 +63,11 @@ public class FamilyFragment extends Fragment {
                 String strNew = (String) et.getText().toString();
 
                 if(strNew.length() > 0){
-                    items.add(strNew);
-
                     et.setText("");
 
                     adapter.notifyDataSetChanged();
 
-                    saveItemsToFile();
+                    saveItemsToFile(strNew);
 
                 }
                 // 이렇게 하면 010-xxxx-xxxx로 저장
@@ -141,18 +141,32 @@ public class FamilyFragment extends Fragment {
         return view;
     }
 
-    private void saveItemsToFile() {
+    private void saveItemsToFile(String strNew) {
         File file = new File(getActivity().getFilesDir(), fileName);
         FileWriter fw = null;
         BufferedWriter bufwr = null;
 
+        FileReader fr = null;
+        BufferedReader bufrd =null;
+        String str;
+
         if(file.exists()) {
             try {
+                fr = new FileReader(file);
+                bufrd = new BufferedReader(fr);
+
+                while((str = bufrd.readLine()) != null){
+                    items.add(str);
+                }
+                items.add(strNew);
+
+                bufrd.close();
+                fr.close();
+
                 fw = new FileWriter(file);
                 bufwr = new BufferedWriter(fw);
-
-                for (String str : items) {
-                    bufwr.write(str);
+                for (String str1 : items) {
+                    bufwr.write(str1);
                     bufwr.newLine();
                 }
 

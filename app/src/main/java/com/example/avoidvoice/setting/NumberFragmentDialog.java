@@ -66,6 +66,10 @@ public class NumberFragmentDialog extends DialogFragment {
                 count = adapter.getCount();
 
                 if(count > 0){
+                    File file = new File(getActivity().getFilesDir(), fileName);
+                    FileWriter fw = null;
+                    BufferedWriter bufwr = null;
+
                     checkedIndex = phoneNumberListView.getCheckedItemPosition();
                     if(checkedIndex > -1 && checkedIndex < count){
                         items.remove(checkedIndex);
@@ -76,6 +80,35 @@ public class NumberFragmentDialog extends DialogFragment {
 
 //                        FamilyFragment.saveItemsToFile();
                     }
+                    if(file.exists()) {
+
+                        try{
+                            fw = new FileWriter(file);
+                            bufwr = new BufferedWriter(fw);
+                            for (String str1 : items) {
+                                bufwr.write(str1);
+                                bufwr.newLine();
+                            }
+
+                            bufwr.flush();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        try {
+                            if (bufwr != null) {
+                                bufwr.close();
+                            }
+
+                            if (fw != null) {
+                                fw.close();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+
                 }
             }
         });
