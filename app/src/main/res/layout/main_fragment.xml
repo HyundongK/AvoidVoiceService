@@ -30,6 +30,13 @@
                 android:layout_height="wrap_content"
                 android:text="testPage"/>
 
+            <Button
+                android:id="@+id/NotiTest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NotiTest"
+                android:layout_marginLeft="10dp"/>
+
 <!--            <TextView-->
 <!--                android:id="@+id/M_title"-->
 <!--                android:layout_width="wrap_content"-->
@@ -93,6 +100,16 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="10dp"/>
+
+<!--            <Button-->
+<!--                android:id="@+id/BankNumBtn"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="주요 연락처 보러가기 >"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:textColor="#000000"-->
+<!--                android:backgroundTint="#ffffff"/>-->
+
 
         </LinearLayout>
 

@@ -23,33 +23,44 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="10dp"/>
 
-        <TextView
-            android:id="@+id/testSet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="25sp"
-            android:textColor="#000000"
-            app:layout_constraintTop_toBottomOf="@+id/dialogTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"/>
-
-<!--        <ListView-->
-<!--            android:id="@+id/numberList"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="0dp"-->
-<!--            android:background="#f4f4f4"-->
+<!--        <TextView-->
+<!--            android:id="@+id/testSet"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="25sp"-->
+<!--            android:textColor="#000000"-->
 <!--            app:layout_constraintTop_toBottomOf="@+id/dialogTitle"-->
 <!--            app:layout_constraintStart_toStartOf="parent"-->
 <!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintVertical_weight="5"-->
-<!--            android:layout_marginTop="10dp"-->
-<!--            android:layout_marginLeft="10dp"-->
-<!--            android:layout_marginRight="10dp"-->
-<!--            android:layout_marginBottom="10dp"-->
-<!--            app:layout_constraintVertical_bias="0.0"/>-->
+<!--            android:layout_marginStart="10dp"-->
+<!--            android:layout_marginEnd="10dp"/>-->
+
+        <ListView
+            android:id="@+id/numberList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:choiceMode="singleChoice"
+            android:background="#f4f4f4"
+            app:layout_constraintTop_toBottomOf="@+id/dialogTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_weight="1"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintVertical_bias="0.0"/>
+
+        <Button
+            android:id="@+id/delBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="번호 삭제"
+            android:backgroundTint="#4D66A7"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/numberList"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
