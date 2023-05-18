@@ -144,7 +144,7 @@ public class VoiceAvoidService extends Service {
                 contentMic.clear();
                 //TODO : make to check conversation
 
-                //setRecognizedText(TextUtils.join(" ", content));
+
             });
 
 
@@ -178,7 +178,7 @@ public class VoiceAvoidService extends Service {
     }
 
 
-    private void stopConvert() {
+        private void stopConvert() {
         if (recoMic != null) {
             final Future<Void> task = recoMic.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {

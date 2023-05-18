@@ -41,10 +41,10 @@ public class MainFragment extends Fragment {
             }
         });
 
-        arrayList.add(R.drawable.banknum1);
-        arrayList.add(R.drawable.banknum2);
-        arrayList.add(R.drawable.banknum3);
-        arrayList.add(R.drawable.banknum4);
+        arrayList.add(R.drawable.bank_num1);
+        arrayList.add(R.drawable.bank_num2);
+        arrayList.add(R.drawable.bank_num3);
+        arrayList.add(R.drawable.bank_num4);
         arrayList.add(R.drawable.banknum5);
 
         MainAdapter mainAdapter = new MainAdapter(getActivity().getApplicationContext(), arrayList);
