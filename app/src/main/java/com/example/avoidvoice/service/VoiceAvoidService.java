@@ -54,7 +54,6 @@ public class VoiceAvoidService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -82,7 +81,6 @@ public class VoiceAvoidService extends Service {
         this.releaseMicrophoneStream();
 
         microphoneStream = new STTAudioStream(MICSOURCE);
-        audioStream = new STTAudioStream(AUDIOSOURCE);
         return microphoneStream;
     }
 
