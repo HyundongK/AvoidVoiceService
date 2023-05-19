@@ -16,6 +16,8 @@ import com.example.avoidvoice.chatapi.ChatGptApi;
 import com.example.avoidvoice.chatapi.TranslateText;
 import com.example.avoidvoice.service.VoiceAvoidService;
 
+import org.json.JSONException;
+
 /*
 테스트를 위한 activity class 후에 삭제 예정
  */
@@ -26,6 +28,9 @@ public class TestActivity extends AppCompatActivity {
 
     private Intent intent;
     private static boolean serviceStarted = false;
+
+    public TestActivity() throws JSONException {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

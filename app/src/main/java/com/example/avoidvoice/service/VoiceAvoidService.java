@@ -140,9 +140,6 @@ public class VoiceAvoidService extends Service {
 
                 totalcontent.addAll(contentMic);
                 contentMic.clear();
-                //TODO : make to check conversation
-
-
             });
 
 
@@ -157,7 +154,9 @@ public class VoiceAvoidService extends Service {
                 contentAudio.clear();
                 //TODO : make to check conversation
 
-                //setRecognizedText(TextUtils.join(" ", content));
+                Log.d("message", TextUtils.join("",totalcontent));
+
+                //setRecognizedText(TextUtils.join(" ", totalcontent));
             });
 
             //start and add to ThreadPool

@@ -2,12 +2,11 @@ package com.example.avoidvoice.chatapi;
 
 import android.os.Build;
 import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.example.avoidvoice.TestActivity;
+import com.example.avoidvoice.BuildConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,56 +27,47 @@ import okhttp3.Response;
 chatGpt turbo 3.5 model api
  */
 public class ChatGptApi {
-
-
     /*
     api response 값 저장 변수
      */
     private String responseMessage;
+    private String gptKey = BuildConfig.GPT_KEY;
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
-    /*
-    api 호출을 위해 OkHttpClient를 사용합니다.
-    TODO : 속도가 좀 느린감이 있어 후에 좀더 빠르게 api를 호출하고 응답받는 방법을 적용할 예정
-    타임아웃 값은 30초로 설정
-    */
+    //이걸 밖에다 만들어볼까..
     OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build();
-
-
     /*
     실제 api를 호출하는 메서드
      */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    public void callAPI(String question, APICallback apiCallback){
+    public void callAPI(String question, APICallback apiCallback, GptMessage gptMessage, int numberOfMessage){
 
         Log.d("callAPI 시작 : ", question);
 
-        JSONObject jsonBody = new JSONObject();
-        JSONObject message = new JSONObject();
+        JSONObject userMessage = new JSONObject();
+        JSONObject GPTMessage = new JSONObject();
 
         try {
-            jsonBody.put("model","gpt-3.5-turbo");
-            message.put("role", "user");
-            message.put("content", question);
-            jsonBody.append("messages", message);
-            jsonBody.put("max_tokens",500);
-            jsonBody.put("temperature",0);
-            jsonBody.put("n",1);
+            userMessage.put("role", "user");
+            userMessage.put("content", (numberOfMessage == 0) ? gptMessage.mmm : question);
+            gptMessage.appendMessage(userMessage);
+
+            System.out.println(gptMessage.gptQuery.toString());
 
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d("json body 에러 : ", question);
         }
 
-        RequestBody body = RequestBody.create(jsonBody.toString(),JSON);
+        RequestBody body = RequestBody.create(gptMessage.gptQuery.toString(),JSON);
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
-                .header("Authorization","Bearer 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")
+                .header("Authorization","Bearer " + gptKey)
                 .post(body)
                 .build();
 
@@ -98,6 +88,11 @@ public class ChatGptApi {
                         response.close();
                         JSONArray jsonArray = jsonObject.getJSONArray("choices");
                         responseMessage = jsonArray.getJSONObject(0).getJSONObject("message").getString("content").trim();
+
+                        GPTMessage.put("role", "assistant");
+                        GPTMessage.put("content", responseMessage);
+                        gptMessage.appendMessage(GPTMessage);
+
                         Log.d("callApi 반환 메세지 : ", responseMessage);
                         apiCallback.onSuccess(responseMessage);
                     } catch (JSONException e) {

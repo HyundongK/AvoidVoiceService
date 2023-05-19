@@ -4,6 +4,8 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 import com.example.avoidvoice.TestActivity;
 
+import org.json.JSONException;
+
 /*
 api 들의 실행순서를 핸들링하는 클래스
 해당 클래스를 인스턴스 생성해서 run 으로 호출 시작
@@ -12,9 +14,13 @@ api 들의 실행순서를 핸들링하는 클래스
 
 public class APIHandler {
     TestActivity targetActivity;
+    GptMessage gptMessage;
+    int numberOfMessage;
 
-    public APIHandler(TestActivity targetActivity){
+    public APIHandler(TestActivity targetActivity) throws JSONException {
         this.targetActivity = targetActivity;
+        this.gptMessage = new GptMessage();
+        this.numberOfMessage = 0;
     }
 
     /*
@@ -34,7 +40,8 @@ public class APIHandler {
         @Override
         public void onSuccess(String resultText) {
             ChatGptApi chatGptApi = new ChatGptApi();
-            chatGptApi.callAPI(resultText, new ChatGptAPICallback());
+            chatGptApi.callAPI(resultText, new ChatGptAPICallback(),gptMessage,numberOfMessage);
+            numberOfMessage++;
         }
 
         @Override
