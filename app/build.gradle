@@ -20,6 +20,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "STT_KEY", properties.getProperty("STT_API_KEY"))
+        buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_API_KEY"))
     }
     signingConfigs {
         debug {
