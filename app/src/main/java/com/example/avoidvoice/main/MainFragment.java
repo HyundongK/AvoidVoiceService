@@ -41,11 +41,17 @@ public class MainFragment extends Fragment {
             }
         });
 
-        arrayList.add(R.drawable.bank_num1);
-        arrayList.add(R.drawable.bank_num2);
-        arrayList.add(R.drawable.bank_num3);
-        arrayList.add(R.drawable.bank_num4);
         arrayList.add(R.drawable.banknum5);
+        arrayList.add(R.drawable.png1);
+        arrayList.add(R.drawable.png2);
+        arrayList.add(R.drawable.png3);
+        arrayList.add(R.drawable.png4);
+        arrayList.add(R.drawable.png5);
+        arrayList.add(R.drawable.png6);
+        arrayList.add(R.drawable.png7);
+        arrayList.add(R.drawable.png8);
+        arrayList.add(R.drawable.png9);
+        arrayList.add(R.drawable.png10);
 
         MainAdapter mainAdapter = new MainAdapter(getActivity().getApplicationContext(), arrayList);
         viewPager.setAdapter(mainAdapter);

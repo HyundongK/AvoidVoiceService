@@ -14,6 +14,7 @@ import com.example.avoidvoice.chatapi.ChatGptApi;
 import com.example.avoidvoice.family.FamilyFragment;
 import com.example.avoidvoice.main.MainFragment;
 import com.example.avoidvoice.setting.SetFragment;
+import com.example.avoidvoice.warning.WarningMessage;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new SetFragment()).commit();
                         break;
                     case R.id.test_set:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new SetFragment()).commit();
+                        Intent intent = new Intent(MainActivity.this, WarningMessage.class);
+//                        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new SetFragment()).commit();
+                        startActivity(intent);
                         break;
                 }
                 return true;
