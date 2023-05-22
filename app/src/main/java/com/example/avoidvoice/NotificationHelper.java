@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.avoidvoice.main.MainFragment;
 import com.example.avoidvoice.setting.SetFragment;
+import com.example.avoidvoice.warning.WarningMessage;
 
 public class NotificationHelper extends ContextWrapper {
 
@@ -51,7 +52,7 @@ public class NotificationHelper extends ContextWrapper {
 
     public NotificationCompat.Builder getChannelNotification(String title, String message){
         //Notification 클릭 시, 앱 실행
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent notificationIntent = new Intent(this, WarningMessage.class);
         PendingIntent notificationPendingIntent = PendingIntent.getActivity
                 (this,0,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
