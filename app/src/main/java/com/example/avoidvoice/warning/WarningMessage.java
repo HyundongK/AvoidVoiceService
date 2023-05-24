@@ -63,7 +63,7 @@ public class WarningMessage extends AppCompatActivity {
         });
     }
     //사용자 채팅 올리는 부분 마지막에는 삭제
-    void addToChat(String message,String sentBy){
+    public void addToChat(String message,String sentBy){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -75,9 +75,14 @@ public class WarningMessage extends AppCompatActivity {
     }
 
     //callapi로 결과값을 가져온걸로 채팅창 추가
-    void addResponse(String response){
-        //messageList.remove(messageList.size()-1);
+    public void addResponse(String response){
+        messageList.remove(messageList.size()-1);
         addToChat(response,Message.SENT_BY_BOT);
+    }
+
+    //GPT : 대화 분석 중... 메세지를 추가 답변이 response되면 삭제
+    public void addWait(){
+        messageList.add(new Message("GPT : 대화 분석 중...", Message.SENT_BY_BOT));
     }
 }
 

@@ -32,7 +32,6 @@ public class ChatGptApi {
      */
     private String responseMessage;
     private String gptKey = BuildConfig.GPT_KEY;
-
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     //이걸 밖에다 만들어볼까..
