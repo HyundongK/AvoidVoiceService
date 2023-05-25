@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static BottomNavigationView bottomNavigationView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -53,6 +53,7 @@
 
         <activity
             android:name=".warning.WarningMessage"
+            android:parentActivityName=".MainActivity"
             android:exported="true">
 <!--            <intent-filter>-->
 <!--                <action android:name="android.intent.action.MAIN" />-->

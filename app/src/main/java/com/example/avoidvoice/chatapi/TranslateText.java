@@ -53,7 +53,7 @@ public class TranslateText extends AsyncTask<String, Void, String> {
             JSONObject result = message.getJSONObject("result");
             translatedText = result.getString("translatedText");
 
-            Log.d("번역 결과 : ",translatedText);
+            //Log.d("번역 결과 : ",translatedText);
 
         } catch (IOException e) {
             e.printStackTrace();

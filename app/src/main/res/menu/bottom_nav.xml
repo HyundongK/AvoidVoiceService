@@ -22,6 +22,7 @@
     <item
         android:id = "@+id/test_set"
         android:enabled="true"
+        android:icon="@drawable/baseline_warning_24"
         android:title="경고알림" />
 
 

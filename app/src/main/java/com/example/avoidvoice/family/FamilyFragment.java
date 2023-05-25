@@ -150,6 +150,20 @@ public class FamilyFragment extends Fragment {
         BufferedReader bufrd =null;
         String str;
 
+        if(!file.exists()){
+            try {
+                fw = new FileWriter(file);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            try {
+                if (fw != null) {
+                    fw.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         if(file.exists()) {
             try {
                 fr = new FileReader(file);
