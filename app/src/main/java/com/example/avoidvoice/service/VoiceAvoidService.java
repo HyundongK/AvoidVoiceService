@@ -13,11 +13,13 @@ import com.microsoft.cognitiveservices.speech.SpeechConfig;
 import com.microsoft.cognitiveservices.speech.SpeechRecognizer;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
 
 
 public class VoiceAvoidService extends Service {
@@ -30,26 +32,27 @@ public class VoiceAvoidService extends Service {
 
     private boolean micStarted = false;
     private boolean audioStarted = false;
+    private boolean fileStarted = false;
     private SpeechRecognizer recoMic = null;
     private SpeechRecognizer recoAudio = null;
+    private SpeechRecognizer recoFile = null;
     private AudioConfig micInput = null;
     private AudioConfig audioInput = null;
+    private AudioConfig fileInput = null;
     private ArrayList<String> contentMic = new ArrayList<>();
     private ArrayList<String> contentAudio = new ArrayList<>();
+    private ArrayList<String> contentFile = new ArrayList<>();
 
     private ArrayList<String> totalcontent = new ArrayList<>();
 
     private STTAudioStream microphoneStream;
     private STTAudioStream audioStream;
 
+
+    private String sttFile = "pronunciation_assessment.wav";
+
     public VoiceAvoidService() {
 
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        onTaskRemoved(intent);
-        return START_STICKY;
     }
 
     @Override
@@ -68,8 +71,18 @@ public class VoiceAvoidService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        startConvert();
     }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        boolean test = intent.getBooleanExtra("test", false);
+        if(test)
+            startFileSTT();
+        else startConvert();
+
+        return super.onStartCommand(intent, flags, startId);
+    }
+
 
     @Override
     public void onDestroy() {
@@ -99,7 +112,7 @@ public class VoiceAvoidService extends Service {
     }
 
     private void releaseAudioStream() {
-        if(audioStream != null) {
+        if (audioStream != null) {
             audioStream.close();
             audioStream = null;
         }
@@ -154,7 +167,7 @@ public class VoiceAvoidService extends Service {
                 contentAudio.clear();
                 //TODO : make to check conversation
 
-                Log.d("message", TextUtils.join("",totalcontent));
+                Log.d("message", TextUtils.join("", totalcontent));
 
                 //setRecognizedText(TextUtils.join(" ", totalcontent));
             });
@@ -175,7 +188,7 @@ public class VoiceAvoidService extends Service {
     }
 
 
-        private void stopConvert() {
+    private void stopConvert() {
         if (recoMic != null) {
             final Future<Void> task = recoMic.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {
@@ -190,6 +203,13 @@ public class VoiceAvoidService extends Service {
                 Log.i(logTag, "Continuous recognition stopped.");
             });
         }
+        if (recoFile != null) {
+            final Future<Void> task = recoFile.stopContinuousRecognitionAsync();
+            setOnTaskCompletedListener(task, result -> {
+                fileStarted = false;
+                Log.i(logTag, "Continuous recognition stopped.");
+            });
+        }
 
         //TODO: save text data
 
@@ -199,7 +219,9 @@ public class VoiceAvoidService extends Service {
 
         contentMic.clear();
         contentAudio.clear();
+        contentFile.clear();
         totalcontent.clear();
+
 
         return;
     }
@@ -217,8 +239,66 @@ public class VoiceAvoidService extends Service {
     }
 
     private static ExecutorService s_executorService;
+
     static {
         s_executorService = Executors.newCachedThreadPool();
     }
 
+    private void startFileSTT() {
+        final SpeechConfig speechConfig;
+        try {
+            speechConfig = SpeechConfig.fromSubscription(SpeechSubscriptionKey, SpeechRegion);
+            speechConfig.setSpeechRecognitionLanguage("ko-KR");
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return;
+        }
+
+        contentFile.clear();
+
+        //try recognize continuously
+        try {
+            fileInput = AudioConfig.fromWavFileInput(copyAssetToCacheAndGetFilePath(sttFile));
+
+            recoFile = new SpeechRecognizer(speechConfig, fileInput);
+
+            Toast.makeText(getApplicationContext(), "start", Toast.LENGTH_SHORT).show();
+            //event that a speech ended
+            recoFile.recognized.addEventListener((o, speechRecognitionResultEventArgs) -> {
+                final String s = speechRecognitionResultEventArgs.getResult().getText();
+                Log.i(logTag, "Final result received: " + s);
+                contentFile.add(s);
+            });
+
+            //start and add to ThreadPool
+            final Future<Void> fileTask = recoFile.startContinuousRecognitionAsync();
+            setOnTaskCompletedListener(fileTask, result -> {
+                fileStarted = true;
+            });
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+
+    }
+
+    private String copyAssetToCacheAndGetFilePath(String filename) {
+        File cacheFile = new File(getCacheDir() + "/" + filename);
+        if (!cacheFile.exists()) {
+            try {
+                InputStream is = getAssets().open(filename);
+                int size = is.available();
+                byte[] buffer = new byte[size];
+                is.read(buffer);
+                is.close();
+                FileOutputStream fos = new FileOutputStream(cacheFile);
+                fos.write(buffer);
+                fos.close();
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return cacheFile.getPath();
+    }
 }

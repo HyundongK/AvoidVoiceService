@@ -17,6 +17,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
             String incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
             intentStt = new Intent(context, VoiceAvoidService.class);
+            intentStt.putExtra("test", false);
 
             if(state.equals(TelephonyManager.EXTRA_STATE_RINGING)){
                 //Toast.makeText(context,"Ringing State Number is -"+incomingNumber,Toast.LENGTH_SHORT).show();
