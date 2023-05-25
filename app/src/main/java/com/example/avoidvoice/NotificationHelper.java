@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -52,15 +53,21 @@ public class NotificationHelper extends ContextWrapper {
 
     public NotificationCompat.Builder getChannelNotification(String title, String message){
         //Notification 클릭 시, 앱 실행
-        Intent notificationIntent = new Intent(this, WarningMessage.class);
-        PendingIntent notificationPendingIntent = PendingIntent.getActivity
-                (this,0,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent notificationIntent = new Intent(this,WarningMessage.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(WarningMessage.class);
+        stackBuilder.addNextIntent(notificationIntent);
+        PendingIntent resultIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+//        PendingIntent notificationPendingIntent = PendingIntent.getActivity
+//                (this,0,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(getApplicationContext(),channelID)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentIntent(notificationPendingIntent)
+                .setSmallIcon(R.drawable.logo)
+                .setContentIntent(resultIntent)
+                /*notificationPendingIntent*/
                 .setAutoCancel(true);
 
         return notifyBuilder;

@@ -1,5 +1,6 @@
 package com.example.avoidvoice.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.avoidvoice.NotificationHelper;
 import com.example.avoidvoice.R;
+import com.example.avoidvoice.TestActivity;
 
 import java.util.ArrayList;
 
@@ -20,6 +22,7 @@ public class MainFragment extends Fragment {
     private View view;
     private ViewPager viewPager;
     ArrayList<Integer> arrayList = new ArrayList<>();
+    private Button testBtn;
     private Button testNoti;
     private NotificationHelper mNotificationhelper;
 
@@ -28,10 +31,18 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.main_fragment, container, false);
         viewPager = view.findViewById(R.id.viewPager);
+        testBtn = view.findViewById(R.id.testButton);
         testNoti = view.findViewById(R.id.NotiTest);
 
+        Intent intent = new Intent(getActivity(), TestActivity.class);
         mNotificationhelper = new NotificationHelper(getActivity().getApplicationContext());
 
+        testBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(intent);
+            }
+        });
         testNoti.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,6 +63,8 @@ public class MainFragment extends Fragment {
         arrayList.add(R.drawable.png8);
         arrayList.add(R.drawable.png9);
         arrayList.add(R.drawable.png10);
+
+
 
         MainAdapter mainAdapter = new MainAdapter(getActivity().getApplicationContext(), arrayList);
         viewPager.setAdapter(mainAdapter);
