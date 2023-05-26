@@ -166,7 +166,7 @@ public class VoiceAvoidService extends Service {
                 contentAudio.clear();
                 //TODO : make to check conversation
 
-                Log.d("message", TextUtils.join("", totalcontent));
+                Log.d("message", TextUtils.join(" ", totalcontent));
 
                 //setRecognizedText(TextUtils.join(" ", totalcontent));
             });
@@ -265,7 +265,9 @@ public class VoiceAvoidService extends Service {
             recoFile.recognized.addEventListener((o, speechRecognitionResultEventArgs) -> {
                 final String s = speechRecognitionResultEventArgs.getResult().getText();
                 Log.i(logTag, "Final result received: " + s);
-                contentFile.add(s);
+                contentFile.add(s+"\n");
+
+                //TODO: 파일을 STT하여 contentFile에 저장 TextUtils.join(" ", contentFile)으로 문자열 변환
             });
 
             //start and add to ThreadPool
