@@ -48,7 +48,6 @@ public class VoiceAvoidService extends Service {
     private STTAudioStream microphoneStream;
     private STTAudioStream audioStream;
 
-
     private String sttFile = "pronunciation_assessment.wav";
 
     public VoiceAvoidService() {
@@ -259,7 +258,6 @@ public class VoiceAvoidService extends Service {
         //try recognize continuously
         try {
             fileInput = AudioConfig.fromWavFileInput(copyAssetToCacheAndGetFilePath(sttFile));
-
             recoFile = new SpeechRecognizer(speechConfig, fileInput);
 
             Toast.makeText(getApplicationContext(), "start", Toast.LENGTH_SHORT).show();
