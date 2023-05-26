@@ -48,7 +48,7 @@ public class VoiceAvoidService extends Service {
     private STTAudioStream microphoneStream;
     private STTAudioStream audioStream;
 
-    private String sttFile = "pronunciation_assessment.wav";
+    private String sttFile = "capital.wav";
 
     public VoiceAvoidService() {
 
@@ -213,8 +213,8 @@ public class VoiceAvoidService extends Service {
         //TODO: save text data
 
 
-        Toast.makeText(getApplicationContext(), TextUtils.join("", totalcontent),
-                Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), TextUtils.join("", totalcontent),
+        //       Toast.LENGTH_SHORT).show();
 
         contentMic.clear();
         contentAudio.clear();
@@ -266,7 +266,6 @@ public class VoiceAvoidService extends Service {
                 final String s = speechRecognitionResultEventArgs.getResult().getText();
                 Log.i(logTag, "Final result received: " + s);
                 contentFile.add(s+"\n");
-
                 //TODO: 파일을 STT하여 contentFile에 저장 TextUtils.join(" ", contentFile)으로 문자열 변환
             });
 
