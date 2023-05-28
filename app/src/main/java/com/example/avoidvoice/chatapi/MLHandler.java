@@ -1,11 +1,19 @@
 package com.example.avoidvoice.chatapi;
 
+import android.content.Context;
 import android.os.Build;
+import android.util.Log;
+
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+
+import com.example.avoidvoice.NotificationHelper;
 import com.example.avoidvoice.TestActivity;
+import com.example.avoidvoice.warning.WarningMessage;
+
 import org.json.JSONException;
 
-
+import java.util.concurrent.ExecutionException;
 /*
 1. ko -> en
 2. en -> ko
@@ -15,23 +23,29 @@ import org.json.JSONException;
  */
 
 public class MLHandler {
-    TestActivity targetActivity;
-    ML ml;
-    int warningCount;
+    private int warningCount;
+    private NotificationHelper notificationHelper;
+    //private Context context;
+    private Boolean checkSendMessage;
+    private String mInputText;
+    private GPTHandler gptHandler;
 
 
-    public MLHandler(TestActivity targetActivity) throws JSONException {
-        this.targetActivity = targetActivity;
-        this.ml = new ML();
-        warningCount = 0;
-
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    public MLHandler() throws JSONException {
+        this.warningCount = 0;
+        //this.context = context;
+        //notificationHelper = new NotificationHelper(context);
+        checkSendMessage = false;
+        mInputText="";
+        gptHandler = new GPTHandler();
+        gptHandler.run("first");
     }
 
     //1
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     public void run(String inputText) {
-
-        //warningcount 가 3 이상이면 바로 마지막 api로 보내도 되고
+        mInputText=inputText;
         TranslateText translateText = new TranslateText();
         translateText.execute(inputText, "ko", "en",new MLHandler.TranslateTextCallback());
     }
@@ -55,16 +69,29 @@ public class MLHandler {
     private class MLCallback implements APICallback {
         @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
         @Override
-        public void onSuccess(String resultText) {
-            if(ml.predict(resultText)) warningCount ++;
-
-            if(warningCount==3){
-                //알림주기
-                //문자보내기
-                //chatgpt run - 여기서 하는것보단 뭔가 신호를 주는게 맞을듯
+        public void onSuccess(String resultText) throws ExecutionException, InterruptedException {
+            ML ml =new ML();
+            boolean mlResult = ml.execute(resultText).get();
+            if(mlResult) {
+                warningCount ++;
+                Log.d("ML result", String.valueOf(mlResult));
             }
-            else if(warningCount>3){
+
+            if(warningCount==1 && !checkSendMessage){
+                //알림주기
+                NotificationCompat.Builder nb = notificationHelper.getChannelNotification("알림", "보이스 피싱의 위험이 감지되었습니다.");
+                notificationHelper.getManager().notify(1, nb.build());
+
+                //문자보내기
+
+                checkSendMessage = true;
+
+                //chatgpt run - 원래 input을 사용할꺼면 mInputTexxt , 번역된 input을 사용할꺼면 resultText
+                gptHandler.run(mInputText);
+            }
+            else if(warningCount>=1){
                 //gpt만 run
+                gptHandler.run(mInputText);
             }
         }
 
@@ -72,6 +99,10 @@ public class MLHandler {
         public void onFailure(Exception e) {
             //TODO : 실패시 어떻게 처리할 것인지
         }
+    }
+
+    public int getWarningCount(){
+        return this.warningCount;
     }
 
 }

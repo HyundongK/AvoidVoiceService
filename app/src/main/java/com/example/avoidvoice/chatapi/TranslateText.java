@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -75,7 +76,13 @@ public class TranslateText extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String translatedText) {
         Log.d("번역 완료 : ",translatedText);
 
-        apiCallback.onSuccess(translatedText);
+        try {
+            apiCallback.onSuccess(translatedText);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
