@@ -27,30 +27,33 @@ import java.util.concurrent.Future;
 public class VoiceAvoidService extends Service {
     private static final String SpeechSubscriptionKey = BuildConfig.STT_KEY;
     private static final String SpeechRegion = "koreacentral";
-    private static final int MICSOURCE = MediaRecorder.AudioSource.VOICE_UPLINK;
-    private static final int AUDIOSOURCE = MediaRecorder.AudioSource.VOICE_DOWNLINK;
-    private static final int DEFAULTSOURCE = MediaRecorder.AudioSource.DEFAULT;
+    private static final int ULSOURCE = MediaRecorder.AudioSource.VOICE_UPLINK;
+    private static final int DLSOURCE = MediaRecorder.AudioSource.VOICE_DOWNLINK;
+    private static final int MICSOURCE = MediaRecorder.AudioSource.MIC;
 
     private static final String logTag = "stt";
 
-    private boolean micStarted = false;
-    private boolean audioStarted = false;
+    private boolean ulStarted = false;
+    private boolean dlStarted = false;
     private boolean fileStarted = false;
-    private SpeechRecognizer recoMic = null;
-    private SpeechRecognizer recoAudio = null;
+    private boolean micStarted = false;
+    private SpeechRecognizer recoUl = null;
+    private SpeechRecognizer recoDl = null;
     private SpeechRecognizer recoFile = null;
-    private AudioConfig micInput = null;
-    private AudioConfig audioInput = null;
+    private SpeechRecognizer recoMic = null;
+    private AudioConfig ulInput = null;
+    private AudioConfig dlInput = null;
     private AudioConfig fileInput = null;
-    private ArrayList<String> contentMic = new ArrayList<>();
-    private ArrayList<String> contentAudio = new ArrayList<>();
+    private AudioConfig micInput = null;
+    private ArrayList<String> contentUl = new ArrayList<>();
+    private ArrayList<String> contentDl = new ArrayList<>();
     private ArrayList<String> contentFile = new ArrayList<>();
-
+    private ArrayList<String> contentMic = new ArrayList<>();
     private ArrayList<String> totalcontent = new ArrayList<>();
 
+    private STTAudioStream uplinkStream;
+    private STTAudioStream downlinkStream;
     private STTAudioStream microphoneStream;
-    private STTAudioStream audioStream;
-    private STTAudioStream defaultStream;
 
     private MediaPlayer mp;
 
@@ -80,10 +83,11 @@ public class VoiceAvoidService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        boolean test = intent.getBooleanExtra("test", false);
-        if(test)
+        int test = intent.getIntExtra("test", 0);
+        if(test == 1)
             startFileSTT();
-        else startConvert();
+        else if(test == 0) startConvert();
+        else if(test == 2) startMicSTT();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -95,45 +99,47 @@ public class VoiceAvoidService extends Service {
         stopConvert();
     }
 
-    private STTAudioStream createMicrophoneStream() {
-        this.releaseMicrophoneStream();
+
+
+    private STTAudioStream createUplinkStream() {
+        this.releaseUplinkStream();
+
+        uplinkStream = new STTAudioStream(ULSOURCE);
+        return uplinkStream;
+    }
+
+    private STTAudioStream createDownlinkStream() {
+        this.releaseDownlinkStream();
+
+        downlinkStream = new STTAudioStream(DLSOURCE);
+        return downlinkStream;
+    }
+
+    private STTAudioStream createMicStream() {
+        this.releaseMicStream();
 
         microphoneStream = new STTAudioStream(MICSOURCE);
         return microphoneStream;
     }
 
-    private STTAudioStream createAudioStream() {
-        this.releaseAudioStream();
-
-        audioStream = new STTAudioStream(AUDIOSOURCE);
-        return audioStream;
+    private void releaseUplinkStream() {
+        if (uplinkStream != null) {
+            uplinkStream.close();
+            uplinkStream = null;
+        }
     }
 
-    private STTAudioStream createDefaultStream() {
-        this.releaseDefaultStream();
-
-        defaultStream = new STTAudioStream(DEFAULTSOURCE);
-        return defaultStream;
+    private void releaseDownlinkStream() {
+        if (downlinkStream != null) {
+            downlinkStream.close();
+            downlinkStream = null;
+        }
     }
 
-    private void releaseMicrophoneStream() {
+    private void releaseMicStream() {
         if (microphoneStream != null) {
             microphoneStream.close();
             microphoneStream = null;
-        }
-    }
-
-    private void releaseAudioStream() {
-        if (audioStream != null) {
-            audioStream.close();
-            audioStream = null;
-        }
-    }
-
-    private void releaseDefaultStream() {
-        if (defaultStream != null) {
-            defaultStream.close();
-            defaultStream = null;
         }
     }
 
@@ -150,40 +156,40 @@ public class VoiceAvoidService extends Service {
         }
 
         totalcontent.clear();
-        contentMic.clear();
-        contentAudio.clear();
+        contentUl.clear();
+        contentDl.clear();
 
         //try recognize continuously
         try {
-            micInput = AudioConfig.fromStreamInput(createMicrophoneStream());
-            audioInput = AudioConfig.fromStreamInput(createAudioStream());
+            ulInput = AudioConfig.fromStreamInput(createUplinkStream());
+            dlInput = AudioConfig.fromStreamInput(createDownlinkStream());
 
-            recoMic = new SpeechRecognizer(speechConfig, micInput);
-            recoAudio = new SpeechRecognizer(speechConfig, audioInput);
+            recoUl = new SpeechRecognizer(speechConfig, ulInput);
+            recoDl = new SpeechRecognizer(speechConfig, dlInput);
 
             Toast.makeText(getApplicationContext(), "start", Toast.LENGTH_SHORT).show();
             //event that a speech ended
-            recoMic.recognized.addEventListener((o, speechRecognitionResultEventArgs) -> {
+            recoUl.recognized.addEventListener((o, speechRecognitionResultEventArgs) -> {
                 final String s = speechRecognitionResultEventArgs.getResult().getText();
                 Log.i(logTag, "Final result received: " + s);
-                contentMic.add(s);
+                contentUl.add(s);
 
-                contentMic.add(0, "\nMe : ");
+                contentUl.add(0, "\nMe : ");
 
-                totalcontent.addAll(contentMic);
-                contentMic.clear();
+                totalcontent.addAll(contentUl);
+                contentUl.clear();
             });
 
 
-            recoAudio.recognized.addEventListener((o, speechRecognitionResultEventArgs) -> {
+            recoDl.recognized.addEventListener((o, speechRecognitionResultEventArgs) -> {
                 final String s = speechRecognitionResultEventArgs.getResult().getText();
                 Log.i(logTag, "Final result received: " + s);
-                contentAudio.add(s);
+                contentDl.add(s);
 
-                contentAudio.add(0, "\nOther : ");
+                contentDl.add(0, "\nOther : ");
 
-                totalcontent.addAll(contentAudio);
-                contentAudio.clear();
+                totalcontent.addAll(contentDl);
+                contentDl.clear();
                 //TODO : make to check conversation
 
                 Log.d("message", TextUtils.join(" ", totalcontent));
@@ -192,13 +198,13 @@ public class VoiceAvoidService extends Service {
             });
 
             //start and add to ThreadPool
-            final Future<Void> micTask = recoMic.startContinuousRecognitionAsync();
-            setOnTaskCompletedListener(micTask, result -> {
-                micStarted = true;
+            final Future<Void> uplinkTask = recoUl.startContinuousRecognitionAsync();
+            setOnTaskCompletedListener(uplinkTask, result -> {
+                ulStarted = true;
             });
-            final Future<Void> audioTask = recoAudio.startContinuousRecognitionAsync();
-            setOnTaskCompletedListener(audioTask, result -> {
-                audioStarted = true;
+            final Future<Void> downlinkTask = recoDl.startContinuousRecognitionAsync();
+            setOnTaskCompletedListener(downlinkTask, result -> {
+                dlStarted = true;
             });
 
         } catch (Exception ex) {
@@ -208,17 +214,17 @@ public class VoiceAvoidService extends Service {
 
 
     private void stopConvert() {
-        if (recoMic != null) {
-            final Future<Void> task = recoMic.stopContinuousRecognitionAsync();
+        if (recoUl != null) {
+            final Future<Void> task = recoUl.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {
-                micStarted = false;
+                ulStarted = false;
                 Log.i(logTag, "Continuous recognition stopped.");
             });
         }
-        if (recoAudio != null) {
-            final Future<Void> task = recoAudio.stopContinuousRecognitionAsync();
+        if (recoDl != null) {
+            final Future<Void> task = recoDl.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {
-                micStarted = false;
+                ulStarted = false;
                 Log.i(logTag, "Continuous recognition stopped.");
             });
         }
@@ -230,6 +236,13 @@ public class VoiceAvoidService extends Service {
                 Log.i(logTag, "Continuous recognition stopped.");
             });
         }
+        if (recoMic != null) {
+            final Future<Void> task = recoMic.stopContinuousRecognitionAsync();
+            setOnTaskCompletedListener(task, result -> {
+                micStarted = false;
+                Log.i(logTag, "Continuous recognition stopped.");
+            });
+        }
 
         //TODO: save text data
 
@@ -237,11 +250,11 @@ public class VoiceAvoidService extends Service {
         //Toast.makeText(getApplicationContext(), TextUtils.join(" ", totalcontent),
         //       Toast.LENGTH_SHORT).show();
 
-        contentMic.clear();
-        contentAudio.clear();
+        contentUl.clear();
+        contentDl.clear();
         contentFile.clear();
+        contentMic.clear();
         totalcontent.clear();
-
 
         return;
     }
@@ -282,8 +295,8 @@ public class VoiceAvoidService extends Service {
 
         //try recognize continuously
         try {
-            //fileInput = AudioConfig.fromWavFileInput(copyAssetToCacheAndGetFilePath(sttFile));
-            fileInput = AudioConfig.fromStreamInput(createDefaultStream());
+            fileInput = AudioConfig.fromWavFileInput(copyAssetToCacheAndGetFilePath(sttFile));
+            //fileInput = AudioConfig.fromStreamInput(createMicStream());
             recoFile = new SpeechRecognizer(speechConfig, fileInput);
 
             Toast.makeText(getApplicationContext(), "start", Toast.LENGTH_SHORT).show();
@@ -304,7 +317,6 @@ public class VoiceAvoidService extends Service {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-
     }
 
     private String copyAssetToCacheAndGetFilePath(String filename) {
@@ -325,5 +337,42 @@ public class VoiceAvoidService extends Service {
             }
         }
         return cacheFile.getPath();
+    }
+
+    private void startMicSTT() {
+        final SpeechConfig speechConfig;
+        try {
+            speechConfig = SpeechConfig.fromSubscription(SpeechSubscriptionKey, SpeechRegion);
+            speechConfig.setSpeechRecognitionLanguage("ko-KR");
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return;
+        }
+
+        contentMic.clear();
+
+        //try recognize continuously
+        try {
+            micInput = AudioConfig.fromStreamInput(createMicStream());
+            recoMic = new SpeechRecognizer(speechConfig, micInput);
+
+            Toast.makeText(getApplicationContext(), "start", Toast.LENGTH_SHORT).show();
+            //event that a speech ended
+            recoMic.recognized.addEventListener((o, speechRecognitionResultEventArgs) -> {
+                final String s = speechRecognitionResultEventArgs.getResult().getText();
+                Log.i(logTag, "Final result received: " + s);
+                contentFile.add(s+"\n");
+                //TODO: 파일을 STT하여 contentFile에 저장 TextUtils.join(" ", contentFile)으로 문자열 변환
+            });
+
+            //start and add to ThreadPool
+            final Future<Void> micTask = recoMic.startContinuousRecognitionAsync();
+            setOnTaskCompletedListener(micTask, result -> {
+                micStarted = true;
+            });
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }

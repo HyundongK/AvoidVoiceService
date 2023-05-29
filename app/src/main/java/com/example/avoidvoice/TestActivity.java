@@ -53,7 +53,7 @@ public class TestActivity extends AppCompatActivity {
         });
 
         intent = new Intent(this, VoiceAvoidService.class);
-        intent.putExtra("test",true);
+        intent.putExtra("test",1);
         startbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
