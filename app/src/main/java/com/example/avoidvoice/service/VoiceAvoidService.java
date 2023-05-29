@@ -112,8 +112,8 @@ public class VoiceAvoidService extends Service {
     private STTAudioStream createDefaultStream() {
         this.releaseDefaultStream();
 
-        audioStream = new STTAudioStream(DEFAULTSOURCE);
-        return audioStream;
+        defaultStream = new STTAudioStream(DEFAULTSOURCE);
+        return defaultStream;
     }
 
     private void releaseMicrophoneStream() {

@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -94,7 +95,7 @@ public class ChatGptApi {
 
                         Log.d("callApi 반환 메세지 : ", responseMessage);
                         apiCallback.onSuccess(responseMessage);
-                    } catch (JSONException e) {
+                    } catch (JSONException | ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                         Log.d("call - response json exception 에러", question);
                     }
@@ -102,7 +103,13 @@ public class ChatGptApi {
                     responseMessage = "Failed to load response due to "+response.body().toString();
                     Log.d("call - response 안떨어짐 에러", question);
                     response.close();
-                    apiCallback.onSuccess(responseMessage);
+                    try {
+                        apiCallback.onSuccess(responseMessage);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
 
                 }
             }

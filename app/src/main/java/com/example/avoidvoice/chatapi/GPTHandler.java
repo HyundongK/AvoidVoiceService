@@ -12,8 +12,8 @@ public class GPTHandler {
     GptMessage gptMessage;
     int numberOfMessage;
 
-    public GPTHandler(WarningMessage targetActivity) throws JSONException {
-        this.warningMessageActivity = targetActivity;
+    public GPTHandler(/*WarningMessage targetActivity*/) throws JSONException {
+        //this.warningMessageActivity = targetActivity;
         this.gptMessage = new GptMessage();
         this.numberOfMessage = 0;
     }

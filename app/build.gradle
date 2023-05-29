@@ -22,20 +22,20 @@ android {
         buildConfigField("String", "STT_KEY", properties.getProperty("STT_API_KEY"))
         buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_API_KEY"))
     }
-    signingConfigs {
-        debug {
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('C:\\Users\\user\\.android\\platform.jks')
-            storePassword 'android'
-        }
-    }
+//    signingConfigs {
+//        debug {
+//            keyAlias 'androiddebugkey'
+//            keyPassword 'android'
+//            storeFile file('C:\\Users\\user\\.android\\platform.jks')
+//            storePassword 'android'
+//        }
+//    }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            //signingConfig signingConfigs.debug
         }
     }
     compileOptions {
