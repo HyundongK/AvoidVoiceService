@@ -1,11 +1,18 @@
 package com.example.avoidvoice.main;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
@@ -14,6 +21,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.avoidvoice.NotificationHelper;
 import com.example.avoidvoice.R;
 import com.example.avoidvoice.TestActivity;
+import com.example.avoidvoice.service.PhoneStateReceiver;
 import com.example.avoidvoice.service.VoiceAvoidService;
 
 import java.util.ArrayList;
@@ -25,9 +33,12 @@ public class MainFragment extends Fragment {
     ArrayList<Integer> arrayList = new ArrayList<>();
     private Button startBTN;
     private Button stopBTN;
+    private Switch mainSwitch;
     private NotificationHelper mNotificationhelper;
     private static boolean serviceStarted = false;
     private Intent intent;
+    private SharedPreferences appData;
+    private boolean saveSwitchData = false;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -36,6 +47,10 @@ public class MainFragment extends Fragment {
         viewPager = view.findViewById(R.id.viewPager);
         startBTN = view.findViewById(R.id.startBTN);
         stopBTN = view.findViewById(R.id.stopBTN);
+        mainSwitch = view.findViewById(R.id.main_switch);
+
+        appData = getContext().getSharedPreferences("appData", MODE_PRIVATE);
+        load();
 
         //Intent intent = new Intent(getActivity(), TestActivity.class);
         mNotificationhelper = new NotificationHelper(getActivity().getApplicationContext());
@@ -66,6 +81,13 @@ public class MainFragment extends Fragment {
             }
         });
 
+        mainSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                save();
+            }
+        });
+
         arrayList.add(R.drawable.banknum5);
         arrayList.add(R.drawable.png1);
         arrayList.add(R.drawable.png2);
@@ -89,5 +111,19 @@ public class MainFragment extends Fragment {
     public void sendOnChannel(String title, String message) {
         NotificationCompat.Builder nb = mNotificationhelper.getChannelNotification(title, message);
         mNotificationhelper.getManager().notify(1, nb.build());
+    }
+
+    private void save() {
+        SharedPreferences.Editor editor = appData.edit();
+
+        editor.putBoolean("MAIN_SWITCH", mainSwitch.isChecked());
+        editor.apply();
+    }
+
+    private void load() {
+        // SharedPreferences 객체.get타입( 저장된 이름, 기본값 )
+        // 저장된 이름이 존재하지 않을 시 기본값
+        saveSwitchData = appData.getBoolean("MAIN_SWITCH", false);
+        mainSwitch.setChecked(saveSwitchData);
     }
 }

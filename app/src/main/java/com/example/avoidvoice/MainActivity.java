@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 
 import com.example.avoidvoice.chatapi.ChatGptApi;
 import com.example.avoidvoice.family.FamilyFragment;
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static BottomNavigationView bottomNavigationView;
     private int fragmentNum = 0;
+    private Switch mainSwitch;
 
 
     @Override

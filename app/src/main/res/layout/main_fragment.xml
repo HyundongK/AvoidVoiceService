@@ -68,12 +68,13 @@
                 android:layout_marginTop="10dp"/>
 
             <Switch
+                android:id="@+id/main_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:track="@drawable/switch_track_selector"
+                android:layout_marginBottom="20dp"
                 android:thumb="@drawable/switch_thumb"
-                android:layout_marginBottom="20dp"/>
+                android:track="@drawable/switch_track_selector" />
 
         </LinearLayout>
 

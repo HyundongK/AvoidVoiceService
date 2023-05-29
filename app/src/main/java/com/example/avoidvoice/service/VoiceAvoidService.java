@@ -2,6 +2,7 @@ package com.example.avoidvoice.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.IBinder;
@@ -60,6 +61,10 @@ public class VoiceAvoidService extends Service {
 
     private String sttFile = "test_sample.wav";
 
+
+    private SharedPreferences appData;
+    private boolean saveSwitchData = true;
+
     public VoiceAvoidService() {
 
     }
@@ -85,9 +90,12 @@ public class VoiceAvoidService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int test = intent.getIntExtra("test", 0);
-        if(test == 1)
-            startFileSTT();
-        else if(test == 0) startConvert();
+        appData = getSharedPreferences("appData", MODE_PRIVATE);
+        saveSwitchData = appData.getBoolean("MAIN_SWITCH", false);
+
+        if(test == 0 && saveSwitchData)
+            startConvert();
+        else if(test == 1)  startFileSTT();
         else if(test == 2) startMicSTT();
 
         return super.onStartCommand(intent, flags, startId);
