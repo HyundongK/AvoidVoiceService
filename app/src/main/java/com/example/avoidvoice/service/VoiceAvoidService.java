@@ -2,6 +2,7 @@ package com.example.avoidvoice.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.IBinder;
 import android.text.TextUtils;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.avoidvoice.BuildConfig;
+import com.example.avoidvoice.R;
 import com.microsoft.cognitiveservices.speech.SpeechConfig;
 import com.microsoft.cognitiveservices.speech.SpeechRecognizer;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
@@ -27,6 +29,7 @@ public class VoiceAvoidService extends Service {
     private static final String SpeechRegion = "koreacentral";
     private static final int MICSOURCE = MediaRecorder.AudioSource.VOICE_UPLINK;
     private static final int AUDIOSOURCE = MediaRecorder.AudioSource.VOICE_DOWNLINK;
+    private static final int DEFAULTSOURCE = MediaRecorder.AudioSource.DEFAULT;
 
     private static final String logTag = "stt";
 
@@ -47,8 +50,11 @@ public class VoiceAvoidService extends Service {
 
     private STTAudioStream microphoneStream;
     private STTAudioStream audioStream;
+    private STTAudioStream defaultStream;
 
-    private String sttFile = "capital.wav";
+    private MediaPlayer mp;
+
+    private String sttFile = "test_sample.wav";
 
     public VoiceAvoidService() {
 
@@ -103,6 +109,13 @@ public class VoiceAvoidService extends Service {
         return audioStream;
     }
 
+    private STTAudioStream createDefaultStream() {
+        this.releaseDefaultStream();
+
+        audioStream = new STTAudioStream(DEFAULTSOURCE);
+        return audioStream;
+    }
+
     private void releaseMicrophoneStream() {
         if (microphoneStream != null) {
             microphoneStream.close();
@@ -114,6 +127,13 @@ public class VoiceAvoidService extends Service {
         if (audioStream != null) {
             audioStream.close();
             audioStream = null;
+        }
+    }
+
+    private void releaseDefaultStream() {
+        if (defaultStream != null) {
+            defaultStream.close();
+            defaultStream = null;
         }
     }
 
@@ -203,6 +223,7 @@ public class VoiceAvoidService extends Service {
             });
         }
         if (recoFile != null) {
+            mp.stop();
             final Future<Void> task = recoFile.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {
                 fileStarted = false;
@@ -213,7 +234,7 @@ public class VoiceAvoidService extends Service {
         //TODO: save text data
 
 
-        //Toast.makeText(getApplicationContext(), TextUtils.join("", totalcontent),
+        //Toast.makeText(getApplicationContext(), TextUtils.join(" ", totalcontent),
         //       Toast.LENGTH_SHORT).show();
 
         contentMic.clear();
@@ -255,9 +276,14 @@ public class VoiceAvoidService extends Service {
 
         contentFile.clear();
 
+        mp = MediaPlayer.create(this, R.raw.test_sample);
+        mp.setLooping(false);
+        mp.start();
+
         //try recognize continuously
         try {
-            fileInput = AudioConfig.fromWavFileInput(copyAssetToCacheAndGetFilePath(sttFile));
+            //fileInput = AudioConfig.fromWavFileInput(copyAssetToCacheAndGetFilePath(sttFile));
+            fileInput = AudioConfig.fromStreamInput(createDefaultStream());
             recoFile = new SpeechRecognizer(speechConfig, fileInput);
 
             Toast.makeText(getApplicationContext(), "start", Toast.LENGTH_SHORT).show();
