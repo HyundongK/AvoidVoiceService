@@ -6,12 +6,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.avoidvoice.R;
+import com.example.avoidvoice.main.MainFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +64,13 @@ public class WarningMessage extends AppCompatActivity {
             welcomeTextView.setVisibility(View.GONE);
         });
     }
+
+//    public void onBackPressed(int keycode, KeyEvent event) {
+//        if(keycode == KeyEvent.KEYCODE_BACK){
+//            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new MainFragment()).commit();
+//        }
+//    }
+
     //사용자 채팅 올리는 부분 마지막에는 삭제
     public void addToChat(String message,String sentBy){
         runOnUiThread(new Runnable() {
@@ -84,5 +93,7 @@ public class WarningMessage extends AppCompatActivity {
     public void addWait(){
         messageList.add(new Message("GPT : 대화 분석 중...", Message.SENT_BY_BOT));
     }
+
+
 }
 

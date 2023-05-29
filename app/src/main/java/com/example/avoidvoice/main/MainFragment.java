@@ -14,6 +14,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.avoidvoice.NotificationHelper;
 import com.example.avoidvoice.R;
 import com.example.avoidvoice.TestActivity;
+import com.example.avoidvoice.service.VoiceAvoidService;
 
 import java.util.ArrayList;
 
@@ -22,33 +23,46 @@ public class MainFragment extends Fragment {
     private View view;
     private ViewPager viewPager;
     ArrayList<Integer> arrayList = new ArrayList<>();
-    private Button testBtn;
-    private Button testNoti;
+    private Button startBTN;
+    private Button stopBTN;
     private NotificationHelper mNotificationhelper;
+    private static boolean serviceStarted = false;
+    private Intent intent;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.main_fragment, container, false);
         viewPager = view.findViewById(R.id.viewPager);
-        testBtn = view.findViewById(R.id.testButton);
-        testNoti = view.findViewById(R.id.NotiTest);
+        startBTN = view.findViewById(R.id.startBTN);
+        stopBTN = view.findViewById(R.id.stopBTN);
 
-        Intent intent = new Intent(getActivity(), TestActivity.class);
+        //Intent intent = new Intent(getActivity(), TestActivity.class);
         mNotificationhelper = new NotificationHelper(getActivity().getApplicationContext());
 
-        testBtn.setOnClickListener(new View.OnClickListener() {
+        intent = new Intent(getContext(), VoiceAvoidService.class);
+        intent.putExtra("test", true);
+        startBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(intent);
+                if(!serviceStarted) {
+                    serviceStarted = true;
+                    getContext().startService(intent);
+                }
             }
         });
-        testNoti.setOnClickListener(new View.OnClickListener() {
+
+        stopBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String title = "보이스피싱 알림";
-                String message = "보이스피싱 위험이 있습니다.";
-                sendOnChannel(title, message);
+                if(serviceStarted) {
+                    serviceStarted = false;
+                    getContext().stopService(intent);
+                }
+
+//                String title = "보이스피싱 알림";
+//                String message = "보이스피싱 위험이 있습니다.";
+//                sendOnChannel(title, message);
             }
         });
 
@@ -72,7 +86,7 @@ public class MainFragment extends Fragment {
         return view;
     }
 
-    private void sendOnChannel(String title, String message) {
+    public void sendOnChannel(String title, String message) {
         NotificationCompat.Builder nb = mNotificationhelper.getChannelNotification(title, message);
         mNotificationhelper.getManager().notify(1, nb.build());
     }

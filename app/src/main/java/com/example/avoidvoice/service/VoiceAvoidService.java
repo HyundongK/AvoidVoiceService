@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.example.avoidvoice.BuildConfig;
 import com.example.avoidvoice.R;
+import com.example.avoidvoice.main.MainFragment;
 import com.microsoft.cognitiveservices.speech.SpeechConfig;
 import com.microsoft.cognitiveservices.speech.SpeechRecognizer;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
@@ -306,6 +307,8 @@ public class VoiceAvoidService extends Service {
                 Log.i(logTag, "Final result received: " + s);
                 contentFile.add(s+"\n");
                 //TODO: 파일을 STT하여 contentFile에 저장 TextUtils.join(" ", contentFile)으로 문자열 변환
+//                MainFragment mainFragment = new MainFragment();
+//                mainFragment.sendOnChannel("경고","메시지");
             });
 
             //start and add to ThreadPool

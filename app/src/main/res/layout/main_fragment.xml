@@ -25,16 +25,16 @@
                 android:layout_marginStart="10dp"/>
 
             <Button
-                android:id="@+id/testButton"
+                android:id="@+id/startBTN"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="testPage"/>
+                android:text="startSTT"/>
 
             <Button
-                android:id="@+id/NotiTest"
+                android:id="@+id/stopBTN"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="NotiTest"
+                android:text="stopSTT"
                 android:layout_marginLeft="10dp"/>
 
 <!--            <TextView-->

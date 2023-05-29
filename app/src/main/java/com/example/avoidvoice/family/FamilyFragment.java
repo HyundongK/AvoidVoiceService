@@ -164,6 +164,7 @@ public class FamilyFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
         if(file.exists()) {
             try {
                 fr = new FileReader(file);
