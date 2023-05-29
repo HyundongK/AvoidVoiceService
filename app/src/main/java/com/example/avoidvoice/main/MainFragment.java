@@ -4,6 +4,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.os.Build;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
@@ -23,6 +25,7 @@ import com.example.avoidvoice.R;
 import com.example.avoidvoice.TestActivity;
 import com.example.avoidvoice.service.PhoneStateReceiver;
 import com.example.avoidvoice.service.VoiceAvoidService;
+import com.example.avoidvoice.warning.WarningMessage;
 
 import java.util.ArrayList;
 
@@ -40,6 +43,7 @@ public class MainFragment extends Fragment {
     private SharedPreferences appData;
     private boolean saveSwitchData = false;
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -56,13 +60,16 @@ public class MainFragment extends Fragment {
         mNotificationhelper = new NotificationHelper(getActivity().getApplicationContext());
 
         intent = new Intent(getContext(), VoiceAvoidService.class);
-        intent.putExtra("test", true);
+        intent.putExtra("test", 2);
+
+        Intent warningIntent = new Intent(getActivity().getApplicationContext(), WarningMessage.class);
         startBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!serviceStarted) {
                     serviceStarted = true;
                     getContext().startService(intent);
+                    getContext().startActivity(warningIntent);
                 }
             }
         });

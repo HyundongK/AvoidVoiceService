@@ -47,7 +47,7 @@ public class ChatGptApi {
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     public void callAPI(String question, APICallback apiCallback, GptMessage gptMessage, int numberOfMessage){
 
-        Log.d("callAPI 시작 : ", question);
+        Log.d("callAPI 시작 : ", "qestion :"+ question);
 
         JSONObject userMessage = new JSONObject();
         JSONObject GPTMessage = new JSONObject();

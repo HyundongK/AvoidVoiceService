@@ -5,27 +5,36 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
 import com.example.avoidvoice.BuildConfig;
 import com.example.avoidvoice.R;
+import com.example.avoidvoice.chatapi.ML;
+import com.example.avoidvoice.chatapi.MLHandler;
 import com.example.avoidvoice.main.MainFragment;
 import com.microsoft.cognitiveservices.speech.SpeechConfig;
 import com.microsoft.cognitiveservices.speech.SpeechRecognizer;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
 
+import org.json.JSONException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 
+@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class VoiceAvoidService extends Service {
     private static final String SpeechSubscriptionKey = BuildConfig.STT_KEY;
     private static final String SpeechRegion = "koreacentral";
@@ -60,12 +69,13 @@ public class VoiceAvoidService extends Service {
     private MediaPlayer mp;
 
     private String sttFile = "test_sample.wav";
+    private MLHandler mlHandler;
 
 
     private SharedPreferences appData;
     private boolean saveSwitchData = true;
 
-    public VoiceAvoidService() {
+    public VoiceAvoidService() throws JSONException {
 
     }
 
@@ -85,10 +95,17 @@ public class VoiceAvoidService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        try {
+            mlHandler = new MLHandler(getApplicationContext());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
         int test = intent.getIntExtra("test", 0);
         appData = getSharedPreferences("appData", MODE_PRIVATE);
         saveSwitchData = appData.getBoolean("MAIN_SWITCH", false);
@@ -246,6 +263,7 @@ public class VoiceAvoidService extends Service {
             });
         }
         if (recoMic != null) {
+            mp.stop();
             final Future<Void> task = recoMic.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {
                 micStarted = false;
@@ -314,9 +332,10 @@ public class VoiceAvoidService extends Service {
                 final String s = speechRecognitionResultEventArgs.getResult().getText();
                 Log.i(logTag, "Final result received: " + s);
                 contentFile.add(s+"\n");
+
                 //TODO: 파일을 STT하여 contentFile에 저장 TextUtils.join(" ", contentFile)으로 문자열 변환
-//                MainFragment mainFragment = new MainFragment();
-//                mainFragment.sendOnChannel("경고","메시지");
+                mlHandler.run(TextUtils.join(" ", contentFile));
+
             });
 
             //start and add to ThreadPool
@@ -361,6 +380,9 @@ public class VoiceAvoidService extends Service {
         }
 
         contentMic.clear();
+        mp = MediaPlayer.create(this, R.raw.test_sample);
+        mp.setLooping(false);
+        mp.start();
 
         //try recognize continuously
         try {
@@ -373,7 +395,19 @@ public class VoiceAvoidService extends Service {
                 final String s = speechRecognitionResultEventArgs.getResult().getText();
                 Log.i(logTag, "Final result received: " + s);
                 contentFile.add(s+"\n");
+
                 //TODO: 파일을 STT하여 contentFile에 저장 TextUtils.join(" ", contentFile)으로 문자열 변환
+                //mlHandler.run(TextUtils.join(" ", contentFile));
+
+                //번역 안쓸 때
+                try {
+                    mlHandler.run2(TextUtils.join(" ", contentFile));
+                    contentFile.clear();
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             });
 
             //start and add to ThreadPool

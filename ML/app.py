@@ -42,5 +42,4 @@ def predict():
     return jsonify({'prediction': bool(prediction[0])})
 
 if __name__ == '__main__':
-    # Flask 서버 실행
-    app.run(debug=True)
+    app.run(host='192.168.0.104', port=8080)

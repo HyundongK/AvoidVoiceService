@@ -11,14 +11,12 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.avoidvoice.NotificationHelper;
 import com.example.avoidvoice.TestActivity;
-import com.example.avoidvoice.main.MainFragment;
 import com.example.avoidvoice.warning.WarningMessage;
 
 import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -34,22 +32,19 @@ import java.util.concurrent.ExecutionException;
 public class MLHandler {
     private int warningCount;
     private NotificationHelper notificationHelper;
-    //private Context context;
     private Boolean checkSendMessage;
     private String mInputText;
     private GPTHandler gptHandler;
-    private Context context;
 
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    public MLHandler() throws JSONException {
+    public MLHandler(Context context) throws JSONException {
         this.warningCount = 0;
-        //this.context = context;
-        //notificationHelper = new NotificationHelper(context);
+        notificationHelper = new NotificationHelper(context);
         checkSendMessage = false;
         mInputText="";
         gptHandler = new GPTHandler();
-        gptHandler.run("first");
+        //gptHandler.run("first");
     }
 
     //1
@@ -82,8 +77,6 @@ public class MLHandler {
         public void onSuccess(String resultText) throws ExecutionException, InterruptedException {
             ML ml =new ML();
             boolean mlResult = ml.execute(resultText).get();
-//            notificationHelper = new NotificationHelper();
-//            MainFragment mainFragment = new MainFragment();
             if(mlResult) {
                 warningCount ++;
                 Log.d("ML result", String.valueOf(mlResult));
@@ -91,46 +84,25 @@ public class MLHandler {
 
             if(warningCount==1 && !checkSendMessage){
                 //알림주기
-//                mainFragment.sendOnChannel("알림", "경고");
-//                NotificationCompat.Builder nb = notificationHelper.getChannelNotification("보이스 피싱 알림", "보이스 피싱의 위험이 감지되었습니다.");
-//                notificationHelper.getManager().notify(1, nb.build());
+                NotificationCompat.Builder nb = notificationHelper.getChannelNotification("알림", "보이스 피싱의 위험이 감지되었습니다.");
+                notificationHelper.getManager().notify(1, nb.build());
 
                 //문자보내기
+                sendMessage();
                 checkSendMessage = true;
 
-                String line = null; // 한줄씩 읽기
-                String phoneNum;
-                File saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-                try {
-                    BufferedReader buf = new BufferedReader(new FileReader(saveFile+"/item.list"));
-                    while((line=buf.readLine())!=null){
-                        phoneNum = line;
-                        try {
-                            SmsManager smsManager = SmsManager.getDefault();
-                            smsManager.sendTextMessage(phoneNum, null, "보이스피싱 위험 감지", null, null);
-                        }catch (Exception e){
-                            //
-                        }
-                    }
-                    buf.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
                 //chatgpt run - 원래 input을 사용할꺼면 mInputTexxt , 번역된 input을 사용할꺼면 resultText
-                gptHandler.run(mInputText);
+                gptHandler.run(resultText);
             }
             else if(warningCount>=1){
-                //gpt만 run
-                gptHandler.run(mInputText);
+                gptHandler.run(resultText);
             }
         }
 
         @Override
         public void onFailure(Exception e) {
             //TODO : 실패시 어떻게 처리할 것인지
+            Log.d("ML result", "load fail");
         }
     }
 
@@ -138,4 +110,53 @@ public class MLHandler {
         return this.warningCount;
     }
 
+    public void sendMessage(){
+        String line = null; // 한줄씩 읽기
+        String phoneNum;
+        File saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+        try {
+            BufferedReader buf = new BufferedReader(new FileReader(saveFile+"/item.list"));
+            while((line=buf.readLine())!=null){
+                phoneNum = line;
+                try {
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(phoneNum, null, "보이스피싱 위험 감지", null, null);
+                }catch (Exception e){
+                    //
+                }
+            }
+            buf.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    public void run2(String inputText) throws ExecutionException, InterruptedException {
+        ML ml =new ML();
+        boolean mlResult = ml.execute(inputText).get();
+        if(mlResult) {
+            warningCount ++;
+            Log.d("ML result", String.valueOf(mlResult));
+        }
+
+        if(warningCount==1 && !checkSendMessage){
+            //알림주기
+                NotificationCompat.Builder nb = notificationHelper.getChannelNotification("알림", "보이스 피싱의 위험이 감지되었습니다.");
+                notificationHelper.getManager().notify(1, nb.build());
+
+            //문자보내기
+            sendMessage();
+            checkSendMessage = true;
+
+            //chatgpt run - 원래 input을 사용할꺼면 mInputTexxt , 번역된 input을 사용할꺼면 resultText
+            gptHandler.run(inputText);
+        }
+        else if(warningCount>=1){
+            gptHandler.run(inputText);
+        }
+    }
 }
+
