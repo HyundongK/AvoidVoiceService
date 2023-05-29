@@ -20,6 +20,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity {
 
     private static BottomNavigationView bottomNavigationView;
+    private int fragmentNum = 0;
 
 
     @Override
@@ -38,12 +39,15 @@ public class MainActivity extends AppCompatActivity {
                 switch (menuItem.getItemId()) {
                     //item을 클릭시 id값을 가져와 FrameLayout에 fragment.xml띄우기
                     case R.id.bottom_home:
+                        fragmentNum = 0;
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new MainFragment()).commit();
                         break;
                     case R.id.bottom_family:
+                        fragmentNum = 1;
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new FamilyFragment()).commit();
                         break;
                     case R.id.bottom_set:
+                        fragmentNum = 2;
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new SetFragment()).commit();
                         break;
                     case R.id.test_set:
@@ -68,4 +72,23 @@ public class MainActivity extends AppCompatActivity {
 //        });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        switch (fragmentNum) {
+            case 0:
+                View view = bottomNavigationView.findViewById(R.id.bottom_home);
+                view.performClick();
+                break;
+            case 1:
+                view = bottomNavigationView.findViewById(R.id.bottom_family);
+                view.performClick();
+                break;
+            case 2:
+                view = bottomNavigationView.findViewById(R.id.bottom_set);
+                view.performClick();
+                break;
+        }
+    }
 }
