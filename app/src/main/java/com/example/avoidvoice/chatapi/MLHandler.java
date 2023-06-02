@@ -35,12 +35,13 @@ public class MLHandler {
     private Boolean checkSendMessage;
     private String mInputText;
     private GPTHandler gptHandler;
+    private Context context;
 
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     public MLHandler(Context context) throws JSONException {
         this.warningCount = 0;
-        notificationHelper = new NotificationHelper(context);
+        this.context = context;
         checkSendMessage = false;
         mInputText="";
         gptHandler = new GPTHandler();
@@ -84,6 +85,7 @@ public class MLHandler {
 
             if(warningCount==1 && !checkSendMessage){
                 //알림주기
+                notificationHelper = new NotificationHelper(context);
                 NotificationCompat.Builder nb = notificationHelper.getChannelNotification("알림", "보이스 피싱의 위험이 감지되었습니다.");
                 notificationHelper.getManager().notify(1, nb.build());
 
@@ -137,6 +139,7 @@ public class MLHandler {
     public void run2(String inputText) throws ExecutionException, InterruptedException {
         ML ml =new ML();
         boolean mlResult = ml.execute(inputText).get();
+        Log.d("ML result", String.valueOf(mlResult));
         if(mlResult) {
             warningCount ++;
             Log.d("ML result", String.valueOf(mlResult));
@@ -144,6 +147,7 @@ public class MLHandler {
 
         if(warningCount==1 && !checkSendMessage){
             //알림주기
+                notificationHelper = new NotificationHelper(context);
                 NotificationCompat.Builder nb = notificationHelper.getChannelNotification("알림", "보이스 피싱의 위험이 감지되었습니다.");
                 notificationHelper.getManager().notify(1, nb.build());
 

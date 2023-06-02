@@ -69,7 +69,6 @@ public class MainFragment extends Fragment {
                 if(!serviceStarted) {
                     serviceStarted = true;
                     getContext().startService(intent);
-                    getContext().startActivity(warningIntent);
                 }
             }
         });

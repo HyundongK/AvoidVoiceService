@@ -334,7 +334,13 @@ public class VoiceAvoidService extends Service {
                 contentFile.add(s+"\n");
 
                 //TODO: 파일을 STT하여 contentFile에 저장 TextUtils.join(" ", contentFile)으로 문자열 변환
-                mlHandler.run(TextUtils.join(" ", contentFile));
+                try {
+                    mlHandler.run2(TextUtils.join(" ", contentFile));
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
 
             });
 
