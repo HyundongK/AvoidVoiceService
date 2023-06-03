@@ -110,10 +110,9 @@ public class VoiceAvoidService extends Service {
         appData = getSharedPreferences("appData", MODE_PRIVATE);
         saveSwitchData = appData.getBoolean("MAIN_SWITCH", false);
 
-        if(test == 0 && saveSwitchData)
-            startConvert();
-        else if(test == 1)  startFileSTT();
-        else if(test == 2) startMicSTT();
+        if(test == 0 && saveSwitchData) startConvert();
+        else if(test == 1 && saveSwitchData) startFileSTT();
+        else if(test == 2 && saveSwitchData) startMicSTT();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -318,6 +317,12 @@ public class VoiceAvoidService extends Service {
 
         mp = MediaPlayer.create(this, R.raw.test_sample);
         mp.setLooping(false);
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                //stopConvert();
+            }
+        });
         mp.start();
 
         //try recognize continuously
@@ -333,7 +338,7 @@ public class VoiceAvoidService extends Service {
                 Log.i(logTag, "Final result received: " + s);
                 contentFile.add(s+"\n");
 
-                //TODO: 파일을 STT하여 contentFile에 저장 TextUtils.join(" ", contentFile)으로 문자열 변환
+                //파일을 STT하여 contentFile에 저장 TextUtils.join(" ", contentFile)으로 문자열 변환
                 try {
                     mlHandler.run2(TextUtils.join(" ", contentFile));
                 } catch (ExecutionException e) {

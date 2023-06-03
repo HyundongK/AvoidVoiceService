@@ -1,6 +1,9 @@
 package com.example.avoidvoice.chatapi;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Environment;
 import android.telephony.SmsManager;
@@ -37,6 +40,9 @@ public class MLHandler {
     private GPTHandler gptHandler;
     private Context context;
 
+    private SharedPreferences appData;
+    private boolean saveSwitchData = false;
+
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     public MLHandler(Context context) throws JSONException {
@@ -46,6 +52,8 @@ public class MLHandler {
         mInputText="";
         gptHandler = new GPTHandler();
         //gptHandler.run("first");
+        appData = context.getSharedPreferences("appData", MODE_PRIVATE);
+        load();
     }
 
     //1
@@ -90,7 +98,7 @@ public class MLHandler {
                 notificationHelper.getManager().notify(1, nb.build());
 
                 //문자보내기
-                sendMessage();
+                if(saveSwitchData) sendMessage();
                 checkSendMessage = true;
 
                 //chatgpt run - 원래 input을 사용할꺼면 mInputTexxt , 번역된 input을 사용할꺼면 resultText
@@ -124,7 +132,7 @@ public class MLHandler {
                     SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(phoneNum, null, "보이스피싱 위험 감지", null, null);
                 }catch (Exception e){
-                    //
+                    Log.d("sms","sms error");
                 }
             }
             buf.close();
@@ -152,7 +160,7 @@ public class MLHandler {
                 notificationHelper.getManager().notify(1, nb.build());
 
             //문자보내기
-            sendMessage();
+            if(saveSwitchData) sendMessage();
             checkSendMessage = true;
 
             //chatgpt run - 원래 input을 사용할꺼면 mInputTexxt , 번역된 input을 사용할꺼면 resultText
@@ -161,6 +169,12 @@ public class MLHandler {
         else if(warningCount>=1){
             gptHandler.run(inputText);
         }
+    }
+
+    private void load() {
+        // SharedPreferences 객체.get타입( 저장된 이름, 기본값 )
+        // 저장된 이름이 존재하지 않을 시 기본값
+        saveSwitchData = appData.getBoolean("SMS_SWITCH", false);
     }
 }
 
