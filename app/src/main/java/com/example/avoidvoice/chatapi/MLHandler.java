@@ -163,7 +163,6 @@ public class MLHandler {
             if(saveSwitchData) sendMessage();
             checkSendMessage = true;
 
-            //chatgpt run - 원래 input을 사용할꺼면 mInputTexxt , 번역된 input을 사용할꺼면 resultText
             gptHandler.run(inputText);
         }
         else if(warningCount>=1){

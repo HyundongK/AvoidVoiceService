@@ -38,6 +38,8 @@ def predict():
     # 예측
     prediction = nb_model.predict(vectorized_text)
 
+    print("Prediction:", prediction)
+
     # 예측 결과 반환
     return jsonify({'prediction': bool(prediction[0])})
 

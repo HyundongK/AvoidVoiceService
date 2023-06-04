@@ -35,7 +35,6 @@ public class ChatGptApi {
     private String gptKey = BuildConfig.GPT_KEY;
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
-    //이걸 밖에다 만들어볼까..
     OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -54,7 +53,16 @@ public class ChatGptApi {
 
         try {
             userMessage.put("role", "user");
-            userMessage.put("content", (numberOfMessage == 0) ? gptMessage.mmm : question);
+
+            if(numberOfMessage == 0 ) {
+                userMessage.put("content", gptMessage.statement);
+            }
+            else if (numberOfMessage == 1) {
+                userMessage.put("content", question);
+            }
+            else if (numberOfMessage >=2){
+                userMessage.put("content",gptMessage.appendStatement + question);
+            }
             gptMessage.appendMessage(userMessage);
 
             System.out.println(gptMessage.gptQuery.toString());
@@ -68,6 +76,7 @@ public class ChatGptApi {
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
                 .header("Authorization","Bearer " + gptKey)
+                .header("Content-Type", "application/json")
                 .post(body)
                 .build();
 
@@ -101,7 +110,7 @@ public class ChatGptApi {
                     }
                 }else{
                     responseMessage = "Failed to load response due to "+response.body().toString();
-                    Log.d("call - response 안떨어짐 에러", question);
+                    Log.d("call - response 안떨어짐", question);
                     response.close();
                     try {
                         apiCallback.onSuccess(responseMessage);

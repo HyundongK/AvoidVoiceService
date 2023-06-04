@@ -413,7 +413,7 @@ public class VoiceAvoidService extends Service {
                 //번역 안쓸 때
                 try {
                     mlHandler.run2(TextUtils.join(" ", contentFile));
-                    contentFile.clear();
+                    //contentFile.clear();
                 } catch (ExecutionException e) {
                     throw new RuntimeException(e);
                 } catch (InterruptedException e) {

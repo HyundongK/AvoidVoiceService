@@ -4,7 +4,6 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,7 +12,7 @@ public class GptMessage {
 
     public JSONObject gptQuery;
 
-    public String mmm =
+    public String statement =
             "안녕, chatGPT 이제부터 당신은 보이스피싱의 위험요소를 검출하는 역할을 하게 될것입니다.\n" +
                     "말 그대로 당신은 내가 주는 통화 대화를 가지고 보이스 피싱의 위험요소를 검출하는 역할을 수행해야 합니다.\n" +
                     "물론 보이스 피싱은 당신의 모든 정보를 동원해도 100% 막을 수 없다는 사실을 인지하고 있습니다. \n" +
@@ -29,7 +28,7 @@ public class GptMessage {
                     "당신이 도움을 주는 국가는 한국이며 지금부터 꼭 한국어를 사용해주세요 영어를 사용하면 안됩니다.\n" +
                     "다음 지시부터 지시대로 행동하기 시작하세요. 감사해요.";
 
-    public String ooo = "위의 대화에서 여태까지 당신이 나에게 알려준 위험요소 외에 다른 위험요소를 발견했다면\n" +
+    public String appendStatement = "위의 대화에서 여태까지 당신이 나에게 알려준 위험요소 외에 다른 위험요소를 발견했다면\n" +
             "어떤 요소를 발견하였는지 나에게 정보를 주세요\n" +
             "만약 당신이 나에게 알려준 위험요소 외에 다른 위험요소를 발견하지 못했다면\n" +
             "반드시 다른 답변을 추가하지 않고 \" 추가된 대화에서 새로운 위험요소가 발견되지 않았습니다. \" 라는 답변을 주세요. 감사합니다.";
