@@ -2,6 +2,7 @@ package com.example.avoidvoice.setting;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.Switch;
 import androidx.fragment.app.Fragment;
 
 import com.example.avoidvoice.R;
+import com.example.avoidvoice.service.VoiceAvoidService;
 
 public class SetFragment extends Fragment {
 
@@ -24,11 +26,17 @@ public class SetFragment extends Fragment {
     private View view;
     private Button numBtn;
     private Switch smsSwitch;
+    private Button startBTN;
+    private Button stopBTN;
     private LinearLayout numLayout;
     private NumberFragmentDialog fragmentDialog;
 
     private SharedPreferences appData;
     private boolean saveSwitchData = false;
+
+    private Intent intent;
+
+    private static boolean serviceStarted = false;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,6 +47,8 @@ public class SetFragment extends Fragment {
         numBtn = view.findViewById(R.id.numBtn);
         smsSwitch = view.findViewById(R.id.smsSwitch);
         numLayout = view.findViewById(R.id.numLayout);
+        startBTN = view.findViewById(R.id.startBTN);
+        stopBTN = view.findViewById(R.id.stopBTN);
 
         appData = getContext().getSharedPreferences("appData", MODE_PRIVATE);
         load();
@@ -67,6 +77,32 @@ public class SetFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 save();
+            }
+        });
+
+        intent = new Intent(getContext(), VoiceAvoidService.class);
+        intent.putExtra("test", 2);
+        startBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!serviceStarted) {
+                    serviceStarted = true;
+                    getContext().startService(intent);
+                }
+            }
+        });
+
+        stopBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(serviceStarted) {
+                    serviceStarted = false;
+                    getContext().stopService(intent);
+                }
+
+//                String title = "보이스피싱 알림";
+//                String message = "보이스피싱 위험이 있습니다.";
+//                sendOnChannel(title, message);
             }
         });
 

@@ -147,22 +147,6 @@
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/removeBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="삭제"
-                android:textSize="15sp"
-                android:backgroundTint="#4D66A7"/>
-
-
-            <Button
-                android:id="@+id/testSMS"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SMS test"
-                android:layout_marginLeft="10dp"/>
 
         </LinearLayout>
 

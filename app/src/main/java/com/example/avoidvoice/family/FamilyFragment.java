@@ -49,7 +49,6 @@ public class FamilyFragment extends Fragment {
         et = view.findViewById(R.id.numEdit);
         et.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 //        testBtn = view.findViewById(R.id.removeBtn);
-        SMStest = view.findViewById(R.id.testSMS);
 
         adapter = new ArrayAdapter(getActivity().getApplicationContext(), android.R.layout.simple_list_item_single_choice, items);
 

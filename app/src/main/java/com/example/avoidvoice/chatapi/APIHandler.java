@@ -73,7 +73,7 @@ public class APIHandler {
             Log.d("ML result", String.valueOf(mlResult));
         }
 
-        if (warningCount == 1 && !checkSendMessage) {
+        if (warningCount == 0 && !checkSendMessage) {
             //알림주기
             notificationHelper = new NotificationHelper(context);
             NotificationCompat.Builder nb = notificationHelper.getChannelNotification("알림", "보이스 피싱의 위험이 감지되었습니다.");

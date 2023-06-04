@@ -34,12 +34,9 @@ public class MainFragment extends Fragment {
     private View view;
     private ViewPager viewPager;
     ArrayList<Integer> arrayList = new ArrayList<>();
-    private Button startBTN;
-    private Button stopBTN;
+
     private Switch mainSwitch;
     private NotificationHelper mNotificationhelper;
-    private static boolean serviceStarted = false;
-    private Intent intent;
     private SharedPreferences appData;
     private boolean saveSwitchData = false;
 
@@ -49,8 +46,7 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.main_fragment, container, false);
         viewPager = view.findViewById(R.id.viewPager);
-        startBTN = view.findViewById(R.id.startBTN);
-        stopBTN = view.findViewById(R.id.stopBTN);
+
         mainSwitch = view.findViewById(R.id.main_switch);
 
         appData = getContext().getSharedPreferences("appData", MODE_PRIVATE);
@@ -59,33 +55,8 @@ public class MainFragment extends Fragment {
         //Intent intent = new Intent(getActivity(), TestActivity.class);
         mNotificationhelper = new NotificationHelper(getActivity().getApplicationContext());
 
-        intent = new Intent(getContext(), VoiceAvoidService.class);
-        intent.putExtra("test", 2);
-
         Intent warningIntent = new Intent(getActivity().getApplicationContext(), WarningMessage.class);
-        startBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!serviceStarted) {
-                    serviceStarted = true;
-                    getContext().startService(intent);
-                }
-            }
-        });
 
-        stopBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(serviceStarted) {
-                    serviceStarted = false;
-                    getContext().stopService(intent);
-                }
-
-//                String title = "보이스피싱 알림";
-//                String message = "보이스피싱 위험이 있습니다.";
-//                sendOnChannel(title, message);
-            }
-        });
 
         mainSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
