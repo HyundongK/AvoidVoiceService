@@ -123,8 +123,8 @@ public class VoiceAvoidService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         stopConvert();
+        super.onDestroy();
     }
 
 
@@ -242,17 +242,19 @@ public class VoiceAvoidService extends Service {
 
 
     private void stopConvert() {
+        ulStarted = false;
+        dlStarted = false;
+        fileStarted = false;
+        micStarted = false;
         if (recoUl != null) {
             final Future<Void> task = recoUl.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {
-                ulStarted = false;
                 Log.i(logTag, "Continuous recognition stopped.");
             });
         }
         if (recoDl != null) {
             final Future<Void> task = recoDl.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {
-                ulStarted = false;
                 Log.i(logTag, "Continuous recognition stopped.");
             });
         }
@@ -260,7 +262,6 @@ public class VoiceAvoidService extends Service {
             mp.stop();
             final Future<Void> task = recoFile.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {
-                fileStarted = false;
                 Log.i(logTag, "Continuous recognition stopped.");
             });
         }
@@ -268,7 +269,6 @@ public class VoiceAvoidService extends Service {
             mp.stop();
             final Future<Void> task = recoMic.stopContinuousRecognitionAsync();
             setOnTaskCompletedListener(task, result -> {
-                micStarted = false;
                 Log.i(logTag, "Continuous recognition stopped.");
             });
         }

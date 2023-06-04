@@ -4,6 +4,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,11 +82,12 @@ public class SetFragment extends Fragment {
         });
 
         intent = new Intent(getContext(), VoiceAvoidService.class);
+
         intent.putExtra("test", 2);
         startBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!serviceStarted) {
+                if (!serviceStarted) {
                     serviceStarted = true;
                     getContext().startService(intent);
                 }
@@ -95,7 +97,7 @@ public class SetFragment extends Fragment {
         stopBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(serviceStarted) {
+                if (serviceStarted) {
                     serviceStarted = false;
                     getContext().stopService(intent);
                 }
