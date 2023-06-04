@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 /*
@@ -32,6 +33,8 @@ api 들의 실행순서를 핸들링하는 클래스
  */
 
 public class APIHandler {
+
+    private final String fileName = "items.list";
     private int warningCount;
     private NotificationHelper notificationHelper;
     private Boolean checkSendMessage;
@@ -50,7 +53,7 @@ public class APIHandler {
         this.warningCount = 0;
         this.context = context;
         checkSendMessage = false;
-        mInputText="";
+        mInputText = "";
         //gptHandler = new GPTHandler();
         //gptHandler.run("first");
         appData = context.getSharedPreferences("appData", MODE_PRIVATE);
@@ -62,40 +65,39 @@ public class APIHandler {
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     public void run(String inputText) throws ExecutionException, InterruptedException {
-        ML ml =new ML();
+        ML ml = new ML();
         boolean mlResult = ml.execute(inputText).get();
         Log.d("ML result", String.valueOf(mlResult));
-        if(mlResult) {
-            warningCount ++;
+        if (mlResult) {
+            warningCount++;
             Log.d("ML result", String.valueOf(mlResult));
         }
 
-        if(warningCount==1 && !checkSendMessage){
+        if (warningCount == 1 && !checkSendMessage) {
             //알림주기
             notificationHelper = new NotificationHelper(context);
             NotificationCompat.Builder nb = notificationHelper.getChannelNotification("알림", "보이스 피싱의 위험이 감지되었습니다.");
             notificationHelper.getManager().notify(1, nb.build());
 
             //문자보내기
-            if(saveSwitchData) sendMessage();
+            if (saveSwitchData) sendMessage();
             checkSendMessage = true;
 
             //gptHandler.run(inputText);
             new GptCallBack().onSuccess(inputText);
-        }
-        else if(warningCount>=1){
+        } else if (warningCount >= 1) {
             //gptHandler.run(inputText);
             new GptCallBack().onSuccess(inputText);
         }
     }
 
-    private class GptCallBack implements APICallback{
+    private class GptCallBack implements APICallback {
 
         @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
         @Override
         public void onSuccess(String resultText) throws ExecutionException, InterruptedException {
             ChatGptApi chatGptApi = new ChatGptApi();
-            chatGptApi.callAPI(resultText, new APIHandler.ChangeActivityCallBack(),gptMessage,numberOfMessage);
+            chatGptApi.callAPI(resultText, new APIHandler.ChangeActivityCallBack(), gptMessage, numberOfMessage);
 
             numberOfMessage++;
         }
@@ -106,7 +108,7 @@ public class APIHandler {
         }
     }
 
-    private class ChangeActivityCallBack implements APICallback{
+    private class ChangeActivityCallBack implements APICallback {
 
         @Override
         public void onSuccess(String resultText) throws ExecutionException, InterruptedException {
@@ -130,26 +132,51 @@ public class APIHandler {
         saveSwitchData = appData.getBoolean("SMS_SWITCH", false);
     }
 
-    public void sendMessage(){
+    public void sendMessage() {
         String line = null; // 한줄씩 읽기
+
+        File file = new File(context.getFilesDir(), fileName);
+        FileReader fr = null;
+        BufferedReader bufrd = null;
         String phoneNum;
-        File saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-        try {
-            BufferedReader buf = new BufferedReader(new FileReader(saveFile+"/item.list"));
-            while((line=buf.readLine())!=null){
-                phoneNum = line;
-                try {
-                    SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(phoneNum, null, "보이스피싱 위험 감지", null, null);
-                }catch (Exception e){
-                    Log.d("sms","sms error");
+
+        if (file.exists()) {
+            try {
+                fr = new FileReader(file);
+                bufrd = new BufferedReader(fr);
+
+                while ((phoneNum = bufrd.readLine()) != null) {
+                    try {
+                        SmsManager smsManager = SmsManager.getDefault();
+                        smsManager.sendTextMessage(phoneNum, null, "보이스피싱 위험 감지", null, null);
+                    } catch (Exception e) {
+                        Log.d("sms", "sms error");
+                    }
                 }
+
+                bufrd.close();
+                fr.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            buf.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+//        File saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+//        try {
+//            BufferedReader buf = new BufferedReader(new FileReader(saveFile+"/item.list"));
+//            while((line=buf.readLine())!=null){
+//                phoneNum = line;
+//                try {
+//                    SmsManager smsManager = SmsManager.getDefault();
+//                    smsManager.sendTextMessage(phoneNum, null, "보이스피싱 위험 감지", null, null);
+//                }catch (Exception e){
+//                    Log.d("sms","sms error");
+//                }
+//            }
+//            buf.close();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 }

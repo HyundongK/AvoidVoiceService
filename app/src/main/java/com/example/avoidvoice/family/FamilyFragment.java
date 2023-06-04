@@ -47,6 +47,7 @@ public class FamilyFragment extends Fragment {
         view = inflater.inflate(R.layout.family_fragment, container, false);
         btn = view.findViewById(R.id.saveBtn);
         et = view.findViewById(R.id.numEdit);
+        et.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 //        testBtn = view.findViewById(R.id.removeBtn);
         SMStest = view.findViewById(R.id.testSMS);
 

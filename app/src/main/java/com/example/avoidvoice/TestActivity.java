@@ -18,6 +18,8 @@ import com.example.avoidvoice.service.VoiceAvoidService;
 
 import org.json.JSONException;
 
+import java.util.concurrent.ExecutionException;
+
 /*
 테스트를 위한 activity class 후에 삭제 예정
  */
@@ -48,11 +50,19 @@ public class TestActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
             @Override
             public void onClick(View view) {
-                apiHandler.run(editText.getText().toString().trim());
+                try {
+                    apiHandler.run(editText.getText().toString().trim());
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
-        intent = new Intent(this, VoiceAvoidService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent = new Intent(this, VoiceAvoidService.class);
+        }
         intent.putExtra("test",1);
         startbtn.setOnClickListener(new View.OnClickListener() {
             @Override
