@@ -24,7 +24,6 @@ public class GPTHandler {
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     public void run(String inputText) {
         ChatGptApi chatGptApi = new ChatGptApi();
-        //warningMessageActivity.addWait();
         chatGptApi.callAPI(inputText, new GPTHandler.ChangeActivity(),gptMessage,numberOfMessage);
 
         numberOfMessage++;

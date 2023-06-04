@@ -1,10 +1,29 @@
 package com.example.avoidvoice.chatapi;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Environment;
+import android.telephony.SmsManager;
+import android.util.Log;
+
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+
+import com.example.avoidvoice.NotificationHelper;
 import com.example.avoidvoice.TestActivity;
+import com.example.avoidvoice.warning.WarningMessage;
 
 import org.json.JSONException;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /*
 api 들의 실행순서를 핸들링하는 클래스
@@ -13,89 +32,124 @@ api 들의 실행순서를 핸들링하는 클래스
  */
 
 public class APIHandler {
-    TestActivity targetActivity;
+    private int warningCount;
+    private NotificationHelper notificationHelper;
+    private Boolean checkSendMessage;
+    private String mInputText;
+    private GPTHandler gptHandler;
+    private Context context;
+
+    private SharedPreferences appData;
+    private boolean saveSwitchData = false;
+
     GptMessage gptMessage;
     int numberOfMessage;
+    private WarningMessage warningMessageActivity = WarningMessage.getInstance();
 
-    public APIHandler(TestActivity targetActivity) throws JSONException {
-        this.targetActivity = targetActivity;
+    public APIHandler(Context context) throws JSONException {
+        this.warningCount = 0;
+        this.context = context;
+        checkSendMessage = false;
+        mInputText="";
+        //gptHandler = new GPTHandler();
+        //gptHandler.run("first");
+        appData = context.getSharedPreferences("appData", MODE_PRIVATE);
+        load();
+
         this.gptMessage = new GptMessage();
         this.numberOfMessage = 0;
     }
 
-    /*
-    api 호출을 시작하는 메서드 : 입력된 텍스트를 영문으로 변환
-     */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    public void run(String inputText) {
-        TranslateText translateText = new TranslateText();
-        translateText.execute(inputText, "ko", "en",new TranslateTextCallback());
+    public void run(String inputText) throws ExecutionException, InterruptedException {
+        ML ml =new ML();
+        boolean mlResult = ml.execute(inputText).get();
+        Log.d("ML result", String.valueOf(mlResult));
+        if(mlResult) {
+            warningCount ++;
+            Log.d("ML result", String.valueOf(mlResult));
+        }
+
+        if(warningCount==1 && !checkSendMessage){
+            //알림주기
+            notificationHelper = new NotificationHelper(context);
+            NotificationCompat.Builder nb = notificationHelper.getChannelNotification("알림", "보이스 피싱의 위험이 감지되었습니다.");
+            notificationHelper.getManager().notify(1, nb.build());
+
+            //문자보내기
+            if(saveSwitchData) sendMessage();
+            checkSendMessage = true;
+
+            //gptHandler.run(inputText);
+            new GptCallBack().onSuccess(inputText);
+        }
+        else if(warningCount>=1){
+            //gptHandler.run(inputText);
+            new GptCallBack().onSuccess(inputText);
+        }
     }
 
-    /*
-    chatGpt api를 호출하는 메서드
-     */
-    private class TranslateTextCallback implements APICallback {
+    private class GptCallBack implements APICallback{
+
         @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
         @Override
-        public void onSuccess(String resultText) {
+        public void onSuccess(String resultText) throws ExecutionException, InterruptedException {
             ChatGptApi chatGptApi = new ChatGptApi();
+            chatGptApi.callAPI(resultText, new APIHandler.ChangeActivityCallBack(),gptMessage,numberOfMessage);
 
-            chatGptApi.callAPI("발신자 : 그러면은 고객님, 이 부분은 정지 풀릴려면은 시간 소요가 조금 되시구요.\n" +
-                    "수신자 : 아 삼년. 삼개월 이상 걸린다고 하던데요.\n" +
-                    "발신자 : 네 6개월에서 일년 정도 그 사이에 풀릴 거예요.\n" +
-                    "수신자 : 아 그래서 어떻게, 어떻게 해야 되는 거예요?\n" +
-                    "발신자 : 제가 말씀 드렸다시피 해결 방법은 이 방법밖에 없으세요.\n" +
-                    "수신자 : 아 그건 아닌 거 같은데요. 제가 생각하기에.\n" +
-                    "발신자 : 그러면은 고객님 뭐 이거 고객님 이거 풀 풀으실려면은 기대 기다렸다가 벌금 무시고 하셔야 되는데\n" +
-                    "수신자 : 아니 처음부터 그렇게 말씀 안하셨잖아요.\n" +
-                    "발신자 : 제가 고객님 처음부터 담당자였나요?\n" +
-                    "수신자 : 아니 저 그 처음 그 담당자하고 통화할 수 있나요 제가?\n" +
-                    "발신자 : 지금은 힘들고요. 지금은 이제 서류가 저희 쪽으로 넘어 와서 지금 저희 팀으로 넘어 왔는데 팀장인 저한테 바로 넘어왔어요.", new ChatGptAPICallback(),gptMessage,numberOfMessage);
             numberOfMessage++;
         }
 
         @Override
         public void onFailure(Exception e) {
-            //TODO : 실패시 어떻게 처리할 것인지
+
         }
     }
 
-    /*
-    chatGpt api에서 반환된 값을 한글로 변환하는 메서드
-     */
-    private class ChatGptAPICallback implements APICallback {
-        @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-        @Override
-        public void onSuccess(String resultText) {
-            TranslateText translateText = new TranslateText();
-            translateText.execute(resultText, "en", "ko", new FinalAPICallback());
-        }
+    private class ChangeActivityCallBack implements APICallback{
 
         @Override
-        public void onFailure(Exception e) {
-            //TODO : 실패시 어떻게 처리할 것인지
-        }
-    }
-
-    /*
-   한글로 변환된 텍스트를 activity에 뿌려주는 메서드
-    */
-    private class FinalAPICallback implements APICallback {
-        @Override
-        public void onSuccess(String resultText) {
-
-            targetActivity.runOnUiThread(new Runnable() {
+        public void onSuccess(String resultText) throws ExecutionException, InterruptedException {
+            warningMessageActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    targetActivity.setTextView(resultText != null ? resultText : "null");
+                    warningMessageActivity.addResponse(resultText);
                 }
             });
         }
 
         @Override
         public void onFailure(Exception e) {
-            //TODO : 실패시 어떻게 처리할 것인지
+
+        }
+    }
+
+    private void load() {
+        // SharedPreferences 객체.get타입( 저장된 이름, 기본값 )
+        // 저장된 이름이 존재하지 않을 시 기본값
+        saveSwitchData = appData.getBoolean("SMS_SWITCH", false);
+    }
+
+    public void sendMessage(){
+        String line = null; // 한줄씩 읽기
+        String phoneNum;
+        File saveFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+        try {
+            BufferedReader buf = new BufferedReader(new FileReader(saveFile+"/item.list"));
+            while((line=buf.readLine())!=null){
+                phoneNum = line;
+                try {
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(phoneNum, null, "보이스피싱 위험 감지", null, null);
+                }catch (Exception e){
+                    Log.d("sms","sms error");
+                }
+            }
+            buf.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

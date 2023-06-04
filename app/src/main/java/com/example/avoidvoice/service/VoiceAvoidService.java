@@ -15,6 +15,7 @@ import androidx.annotation.RequiresApi;
 
 import com.example.avoidvoice.BuildConfig;
 import com.example.avoidvoice.R;
+import com.example.avoidvoice.chatapi.APIHandler;
 import com.example.avoidvoice.chatapi.ML;
 import com.example.avoidvoice.chatapi.MLHandler;
 import com.example.avoidvoice.main.MainFragment;
@@ -70,6 +71,7 @@ public class VoiceAvoidService extends Service {
 
     private String sttFile = "test_sample.wav";
     private MLHandler mlHandler;
+    private APIHandler apiHandler;
 
 
     private SharedPreferences appData;
@@ -102,6 +104,7 @@ public class VoiceAvoidService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             mlHandler = new MLHandler(getApplicationContext());
+            apiHandler = new APIHandler(getApplicationContext());
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -412,7 +415,7 @@ public class VoiceAvoidService extends Service {
 
                 //번역 안쓸 때
                 try {
-                    mlHandler.run2(TextUtils.join(" ", contentFile));
+                    apiHandler.run(TextUtils.join(" ", contentFile));
                     //contentFile.clear();
                 } catch (ExecutionException e) {
                     throw new RuntimeException(e);
