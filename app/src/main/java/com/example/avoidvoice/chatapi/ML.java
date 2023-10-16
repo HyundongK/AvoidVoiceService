@@ -3,6 +3,7 @@ package com.example.avoidvoice.chatapi;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.avoidvoice.BuildConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -16,7 +17,7 @@ public class ML extends AsyncTask<String, Void, Boolean> {
 
     public ML() {
         client = new OkHttpClient();
-        url = "http://218.146.16.130:8080/predict";
+        url = BuildConfig.ML_URL;
         gson = new Gson();
     }
 
